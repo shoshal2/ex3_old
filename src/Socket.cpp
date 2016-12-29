@@ -1,3 +1,8 @@
+//
+// Created by leerosset on 29/12/16.
+//
+
+#include "Socket.h"
 /************************************************************
 * File description: Socket class. creating socket, close 	*
 * socket and method prints the errors occurs while			*
@@ -19,11 +24,11 @@
 * ip, and no port number and socket descriptor, 0 backlogs.			   *
 ***********************************************************************/
 Socket::Socket() {
-	this->ip_address = IP;
-	this->backLog = NONE;
-	this->socketDescriptor = NONE;
-	this->isServer = true;
-	this->port_number = NONE;
+    this->ip_address = IP;
+    this->backLog = NONE;
+    this->socketDescriptor = NONE;
+    this->isServer = true;
+    this->port_number = NONE;
 }
 
 /***********************************************************************
@@ -33,8 +38,5 @@ Socket::Socket() {
 * The Function operation: default destructor					       *
 ***********************************************************************/
 Socket::~Socket() {
-	close(this->socketDescriptor);
+    close(this->socketDescriptor);
 }
-
-
-

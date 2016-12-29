@@ -1,11 +1,8 @@
 //
-// Created by yanaiela on 12/10/16.
+// Created by leerosset on 29/12/16.
 //
 
-#include "src/sockets/Udp.h"
-#include <unistd.h>
-
-using namespace std;
+#include "client.h"
 
 int main(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
@@ -18,7 +15,6 @@ int main(int argc, char *argv[]) {
     udp.sendData("hello");
     udp.reciveData(buffer, sizeof(buffer));
     cout << buffer << endl;
-
 
     return 0;
 }

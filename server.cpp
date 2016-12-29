@@ -1,6 +1,8 @@
-#include <iostream>
-#include "src/sockets/Udp.h"
-#include <unistd.h>
+//
+// Created by leerosset on 29/12/16.
+//
+
+#include "server.h"
 
 int main() {
     std::cout << "Hello, from server" << std::endl;

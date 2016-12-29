@@ -126,7 +126,7 @@ int main(){
 
     int clock = 0; // The Time of the Server
 
-    Socket* socket = new Udp(1, 6555);
+    Socket* socket = new Udp(1, 6557);
     socket->initialize();
 
 

@@ -43,6 +43,7 @@ public:
     void editDriverLocation(int id, GridPoint * gp);
     void getDriverLocation(int id); // print (x,y)
     void startDriving();
+    void moveTheCab(int time);
     void exit();
 
 

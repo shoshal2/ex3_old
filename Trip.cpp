@@ -32,6 +32,7 @@ GridPoint * Trip::move(int meters)
     while(i < meters || !stk.empty()){
         gp = stk.top();
         stk.pop();
+        i++;
     }
     totalCurrent += meters;
     return gp;

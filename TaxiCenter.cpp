@@ -126,8 +126,8 @@ void TaxiCenter::getDriverLocation(int id) {
 }
 
 /**
- * the method that starts the actual driving: the method gets the driver
- * to its final destination according to the trip's information.
+ * the method that starts the actual driving: the method assigns the driver
+ * to its trip and taxi.
  */
 void TaxiCenter::startDriving(){
     std::map<int, Trip*>::iterator itTrip = trips->begin();
@@ -152,24 +152,35 @@ void TaxiCenter::startDriving(){
                 if (it != this->cabs->end()) {
                     itDriver->second->addTaxi(it->second);
                 }
-                GridPoint *g = new GridPoint(itTrip->second->getEndPosition()->getX(),
-                                             itTrip->second->getEndPosition()->getY());
-                itDriver->second->setPosition(g);
-                break;
             }
             itDriver++;
-        }
-        std::map<int,Trip*>::iterator itDelete = trips->find(itTrip->first);
-        if (itDelete != this->trips->end()) {
-            delete(itTrip->second);
-            trips->erase(itTrip->first);
-
         }
         itTrip++;
     }
 }
 
+/**
+ * the method runs over the driver map, and if the driver's trip's time is
+ * as the time of the method, the driver start driving/ continue driving
+ * @param time
+ */
+void TaxiCenter::moveTheCab(int time) {
 
+}
+
+
+
+//TODO: the next few lines are deleting the trip from the array
+/*
+ *
+        std::map<int,Trip*>::iterator itDelete = trips->find(itTrip->first);
+        if (itDelete != this->trips->end()) {
+            delete(itTrip->second);
+            trips->erase(itTrip->first);
+        }
+ *
+ *
+ */
 
 /*
 void TaxiCenter::insertDriver(int id, int age,char status,  int experience, int vahicleId) {

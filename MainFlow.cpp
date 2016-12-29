@@ -11,8 +11,12 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-//using namespace std;
-std::stringstream ss;
+
+
+#include "src/Udp.h"
+#include <unistd.h>
+using namespace std;
+
 
 // take the input string and add a new driver to taxiCanter
 void helperAddDriver(string str, TaxiCenter* center);
@@ -62,6 +66,7 @@ void helperAddTrip(string str, TaxiCenter* center){
     int xEnd;
     int yEnd;
     int passenger;
+    int time;
     double tarriff;
 
 
@@ -81,8 +86,9 @@ void helperAddTrip(string str, TaxiCenter* center){
     ss >> yEnd;
     ss >> passenger;
     ss >> tarriff;
+    ss >> time;
 
-    center->insertTrip(id, xStart, yStart, xEnd, yEnd ,passenger, tarriff);
+    center->insertTrip(id, xStart, yStart, xEnd, yEnd ,passenger, tarriff, time);
 
 }
 
@@ -115,8 +121,14 @@ void helperAddTaxi(string str, TaxiCenter* center){
 }
 
 int main(){
-
+    std::cout << "Hello, from server\n" << std::endl;
     TaxiCenter* center = new TaxiCenter();
+
+    int clock = 0; // The Time of the Server
+
+    Socket* socket = new Udp(1, 6555);
+    socket->initialize();
+
 
     string input = "";
     string format;
@@ -161,10 +173,19 @@ int main(){
     cin >> input;
     while(input != "7"){
 
-        if(input == "1")
-        {
-            cin >> format;
-            helperAddDriver(format, center);
+        if(input == "1") {
+            cin >> input;
+            int numberOfDrivers = stoi(input);
+
+            while (numberOfDrivers > 0) {
+                //cin >> format;
+                char buffer[1024];
+                socket->reciveData(buffer, sizeof(buffer));
+                cout << buffer << endl;
+                string format(buffer);
+                helperAddDriver(format, center);
+                numberOfDrivers--;
+            }
 
         }
         if(input == "2")
@@ -190,9 +211,15 @@ int main(){
 
             center->startDriving();
         }
+
         if(input == "7")
         {
             break;
+        }
+        if(input == "9")
+        {
+            clock += 1;
+            cout << "Time: " << clock << endl;
         }
 
         cin >> input;

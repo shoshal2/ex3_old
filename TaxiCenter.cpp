@@ -94,8 +94,8 @@ void TaxiCenter::insertTaxi(int id, int type, char manufacturer, char color){
  * @param experience
  * @param vahicleId
  */
-void TaxiCenter::insertTrip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff){
-    Trip* trip = new Trip(id, xStart, yStart, xEnd, yEnd ,passenger, tarriff);
+void TaxiCenter::insertTrip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time){
+    Trip* trip = new Trip(id, xStart, yStart, xEnd, yEnd ,passenger, tarriff, time);
     trips->insert ( std::pair<int,Trip*>(id,trip));
 }
 

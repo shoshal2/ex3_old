@@ -4,8 +4,9 @@
 
 #include "Trip.h"
 #include "GridPoint.h"
-Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff) {
-    tripNumber = id;
+Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time) {
+    this->time = time;
+    this->tripNumber = id;
     this->startPoint = new GridPoint(xStart, yStart);
     this->endPoint = new GridPoint(xEnd, yEnd);
     this->currentPoint = startPoint;
@@ -44,6 +45,13 @@ int Trip::GetTripNumber()
 {
     return tripNumber;
 }
+
+
+int Trip::getTime()
+{
+    return time;
+}
+
 
 /**
  * the mthod return the trips tariff

@@ -16,6 +16,7 @@ class Trip {
 private:
     int tripNumber;
     int passengers;
+    int time;
     double tarriff;
     Grid * grid;
     int totalCurrent;
@@ -26,13 +27,14 @@ private:
     bfs b;
 
 public:
-    Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff);
+    Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time);
     ~Trip();
     GridPoint * move(int meters);
     int GetTripNumber();
     double getTarriff();
     int getPassengers();
     int getTotalMeters();
+    int getTime();
 
     GridPoint* getStartPosition();
     GridPoint* getEndPosition();

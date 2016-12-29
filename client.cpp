@@ -7,12 +7,16 @@
 int main(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
-    cout << argv[1] << endl;
-    Udp udp(0, atoi(argv[1]));
+    //cout << argv[1] << endl;
+
+    string input = "";
+
+    Udp udp(0, 6555);
     udp.initialize();
 
     char buffer[1024];
-    udp.sendData("hello");
+    cin >> input;
+    udp.sendData(input);
     udp.reciveData(buffer, sizeof(buffer));
     cout << buffer << endl;
 

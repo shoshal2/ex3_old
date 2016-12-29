@@ -12,7 +12,7 @@ using namespace std;
 
 
 
-Driver::Driver(int id, int age,char status,  int experience, int vahicleId, Grid * g){
+Driver::Driver(int id, int age,char status,  int experience, int vahicleId){
 
     this->id = id;
     this->age = age;
@@ -24,7 +24,7 @@ Driver::Driver(int id, int age,char status,  int experience, int vahicleId, Grid
     costumers = 0;
     taxi = NULL;
     position = new GridPoint(0,0);
-    this->grid = g;
+
 
 }
 

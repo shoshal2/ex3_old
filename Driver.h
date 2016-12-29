@@ -33,7 +33,7 @@ private :
 
 
 public:
-    Driver(int id, int age,char status,  int experience, int vahicleId, Grid * g);
+    Driver(int id, int age,char status,  int experience, int vahicleId);
 
     ~Driver();
 

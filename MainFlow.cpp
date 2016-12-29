@@ -12,7 +12,7 @@
 #include <string>
 #include <sstream>
 using namespace std;
-
+std::stringstream ss;
 
 // take the input string and add a new driver to taxiCanter
 void helperAddDriver(string str, TaxiCenter* center);

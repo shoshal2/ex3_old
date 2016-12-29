@@ -9,9 +9,42 @@
 using namespace std;
 #include "Point.h"
 #include <cstddef>
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
+using namespace boost::archive;
 
 class GridPoint: public Point
 {
+
+    friend class boost::serialization::access;
+
+    template<class Archive>
+
+    void serialize(Archive &ar, const unsigned int version)
+    {
+        ar & distance;
+        ar & visited;
+        ar & x;
+        ar & y;
+        ar & *parent;
+        ar & *neighbor1;
+        ar & *neighbor2;
+        ar & *neighbor3;
+        ar & *neighbor4;
+    }
+
 private:
     int distance;
     bool visited;
@@ -29,6 +62,17 @@ public:
     GridPoint(int X, int Y) : Point(X, Y){
         x = X;
         y = Y;
+        distance = 0;
+        visited = false;
+        parent = NULL;
+        neighbor1 = NULL;
+        neighbor2 = NULL;
+        neighbor3 = NULL;
+        neighbor4 = NULL;
+    };
+    GridPoint() : Point(){
+        x = -1;
+        y = -1;
         distance = 0;
         visited = false;
         parent = NULL;

@@ -161,14 +161,54 @@ void TaxiCenter::startDriving(){
 
 /**
  * the method runs over the driver map, and if the driver's trip's time is
- * as the time of the method, the driver start driving/ continue driving
+ * as the time of the method, the driver start driving/continue driving
  * @param time
  */
 void TaxiCenter::moveTheCab(int time) {
-
+    std::map<int, Driver*>::iterator itDriver = drivers->begin();
+    while(itDriver != drivers->end()) {
+        /*
+         * if the time of the driver's trip equals to the method's time,
+         * move the driver.
+         */
+        if(itDriver->second->getTrip()->getTime() == time){
+            itDriver->second->move();
+        }
+        //update the trip's time
+        itDriver->second->getTrip()->updateTime();
+        //get the next driver
+        itDriver++;
+    }
 }
 
+/**
+ * the method deletes the trips which passed their time.
+ * (meaning, 5 seconds from the begining of the trip are over)
+ */
+void TaxiCenter::deleteTrip() {
 
+    std::map<int, Driver*>::iterator itDriver = drivers->begin();
+
+    while(itDriver != drivers->end()) {
+        /*
+         * if the time of the driver's trip equals to the method's time,
+         * move the driver.
+         */
+        int currentTime = itDriver->second->getTrip()->getTime();
+        int startTime = itDriver->second->getTrip()->getStartingTripTime();
+        //if the trip passed its duarnce
+        if(currentTime == startTime + this->tripDurance){
+            //find the trip
+            std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
+            if (itDelete != this->trips->end()) {
+                delete(itDelete->second);
+                trips->erase(itDelete->first);
+            }
+        }
+        //get the next driver
+        itDriver++;
+    }
+}
 
 //TODO: the next few lines are deleting the trip from the array
 /*

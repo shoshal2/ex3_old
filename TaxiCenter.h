@@ -21,7 +21,7 @@ private:
     map<int,TaxiCab*>* cabs;
     map<int,Trip*> *trips;
     map<int,GridPoint> location;
-
+    int tripDurance = 5;
 
 public:
 //    map<int,Driver*>* drivers;
@@ -44,6 +44,7 @@ public:
     void getDriverLocation(int id); // print (x,y)
     void startDriving();
     void moveTheCab(int time);
+    void deleteTrip();
     void exit();
 
 

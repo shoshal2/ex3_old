@@ -14,9 +14,11 @@ using namespace std;
 
 class Trip {
 private:
+    int tripId;
     int tripNumber;
     int passengers;
-    int time;
+    int startTime;
+    int currentTime;
     double tarriff;
     Grid * grid;
     int totalCurrent;
@@ -31,11 +33,13 @@ public:
     ~Trip();
     GridPoint * move(int meters);
     int GetTripNumber();
+    int getTripId();
     double getTarriff();
     int getPassengers();
     int getTotalMeters();
     int getTime();
-
+    int getStartingTripTime();
+    void updateTime();
     GridPoint* getStartPosition();
     GridPoint* getEndPosition();
 

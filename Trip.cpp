@@ -5,7 +5,8 @@
 #include "Trip.h"
 #include "GridPoint.h"
 Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time) {
-    this->time = time;
+    this->tripId = id;
+    this->startTime = time;
     this->tripNumber = id;
     this->startPoint = new GridPoint(xStart, yStart);
     this->endPoint = new GridPoint(xEnd, yEnd);
@@ -47,12 +48,31 @@ int Trip::GetTripNumber()
     return tripNumber;
 }
 
-
+/**
+ * the method returns the current time of the trip:
+ * the current time starts from the begining time of the trip
+ * (the given time), and continues untill the end of the trip.
+ * @return
+ */
 int Trip::getTime()
 {
-    return time;
+    return currentTime;
 }
 
+/**
+ * the method updates the current time.
+ */
+void Trip::updateTime() {
+    this->currentTime++;
+}
+
+/**
+ * the method returns the starting time of the trip
+ * @return
+ */
+int Trip::getStartingTripTime() {
+    return this->startTime;
+}
 
 /**
  * the mthod return the trips tariff
@@ -61,6 +81,14 @@ int Trip::getTime()
 double Trip::getTarriff()
 {
     return tarriff;
+}
+
+/**
+ * the method return the trip's id
+ * @return
+ */
+int Trip::getTripId() {
+    return this->tripId;
 }
 
 /**

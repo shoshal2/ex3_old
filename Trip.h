@@ -13,6 +13,21 @@ using namespace std;
 #include "bfs.h"
 
 class Trip {
+
+
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &ar, const unsigned int version)
+    {
+        ar & tripId;
+        ar & startPoint;
+        ar & endPoint;
+        ar & passengers;
+        ar & tarriff;
+
+    }
+
+
 private:
     int tripId;
     int tripNumber;

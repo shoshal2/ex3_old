@@ -4,14 +4,14 @@
 
 #include "client.h"
 
-int mainC(int argc, char *argv[]) {
+int mains(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
     //cout << argv[1] << endl;
 
     string input = "";
 
-    Udp udp(0, 6555);
+    Udp udp(0, atoi(argv[1]));
     udp.initialize();
 
     char buffer[1024];

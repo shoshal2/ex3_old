@@ -120,13 +120,13 @@ void helperAddTaxi(string str, TaxiCenter* center){
     center->insertTaxi(id, type, manufacturer, color);
 }
 
-int main(){
+int main(int argc, char *argv[]){
     std::cout << "Hello, from server\n" << std::endl;
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
-
-    Socket* socket = new Udp(1, 6557);
+    int countMove = 0;
+    Socket* socket = new Udp(1, atoi(argv[1]));
     socket->initialize();
 
 
@@ -209,18 +209,31 @@ int main(){
         if(input == "6")
         {
 
+            center->startDriving();
         }
 
         if(input == "7")
         {
             break;
         }
-        if(input == "9")
+
+        if(input == "9" && countMove != 0)
         {
-            center->startDriving(clock);
             clock += 1;
             cout << "Time: " << clock << endl;
+            center->moveTheCab(clock);
+
         }
+        if(input == "9" && countMove == 0)
+        {
+            countMove++;
+            clock += 1;
+            cout << "Time: " << clock << endl;
+            center->startDriving(clock);
+            center->moveTheCab(clock);
+
+        }
+
 
         cin >> input;
     }

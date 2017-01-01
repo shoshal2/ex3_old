@@ -203,7 +203,7 @@ GridPoint* Driver::getPosition()
  */
 void Driver::setPosition(GridPoint* point)
 {
-    position = point;
+    position = new GridPoint(point->getX(), point->getY());;
 }
 
 /**

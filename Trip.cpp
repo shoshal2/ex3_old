@@ -7,6 +7,7 @@
 Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time,  Grid * g) {
     this->tripId = id;
     this->startTime = time;
+    this->currentTime = time;
     this->tripNumber = id;
     this->startPoint = new GridPoint(xStart, yStart);
     this->endPoint = new GridPoint(xEnd, yEnd);
@@ -32,8 +33,12 @@ GridPoint * Trip::move(int meters)
 {
     GridPoint *gp;
     int i = 0;
-    while(i < meters || !stk.empty()){
+    while(i < meters){
+        if(stk.empty()) {
+            break;
+        }
         gp = stk.top();
+        gp->print();
         stk.pop();
         i++;
     }

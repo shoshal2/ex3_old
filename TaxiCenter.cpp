@@ -156,12 +156,13 @@ void TaxiCenter::startDriving(int time){
                         if (it != this->cabs->end()) {
                             itDriver->second->addTaxi(it->second);
                         }
+                        itDriver->second->addTrip(itTrip->second);
                     }
                     itDriver++;
                 }
+                //the trip now has a driver
+                itTrip->second->setTripHasADriver();
             }
-            //the trip now has a driver
-            itTrip->second->setTripHasADriver();
         }
         itTrip++;
         }
@@ -180,11 +181,17 @@ void TaxiCenter::moveTheCab(int time) {
          * if the time of the driver's trip equals to the method's time,
          * move the driver.
          */
-        if(itDriver->second->getTrip()->getTime() == time){
-            itDriver->second->move();
+        if(itDriver->second->getTrip() != NULL) {
+            if(itDriver->second->getTrip()->getTime() == time){
+                int currentTime = itDriver->second->getTrip()->getTime();
+                int startTime = itDriver->second->getTrip()->getStartingTripTime();
+                if(currentTime != (startTime + this->tripDurance) - 1) {
+                    itDriver->second->move();
+                }
+            }
+            //update the trip's time
+            itDriver->second->getTrip()->updateTime();
         }
-        //update the trip's time
-        itDriver->second->getTrip()->updateTime();
         //get the next driver
         itDriver++;
     }
@@ -199,21 +206,25 @@ void TaxiCenter::deleteTrip() {
     std::map<int, Driver*>::iterator itDriver = drivers->begin();
 
     while(itDriver != drivers->end()) {
-        /*
-         * if the time of the driver's trip equals to the method's time,
-         * move the driver.
-         */
-        int currentTime = itDriver->second->getTrip()->getTime();
-        int startTime = itDriver->second->getTrip()->getStartingTripTime();
-        //if the trip passed its duarnce
-        if(currentTime == startTime + this->tripDurance){
-            //find the trip
-            std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
-            if (itDelete != this->trips->end()) {
-                delete(itDelete->second);
-                trips->erase(itDelete->first);
+        if(itDriver->second->getTrip() != NULL) {
+            /*
+             * if the time of the driver's trip equals to the method's time,
+             * move the driver.
+             */
+            int currentTime = itDriver->second->getTrip()->getTime();
+            int startTime = itDriver->second->getTrip()->getStartingTripTime();
+            //if the trip passed its duarnce
+            if(currentTime == startTime + this->tripDurance){
+                //find the trip
+                std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
+                if (itDelete != this->trips->end()) {
+                    delete(itDelete->second);
+                    trips->erase(itDelete->first);
+                    itDriver->second->addTrip(NULL);
+                }
             }
         }
+
         //get the next driver
         itDriver++;
     }

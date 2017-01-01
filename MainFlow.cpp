@@ -126,8 +126,8 @@ int main(int argc, char *argv[]){
 
     int clock = 0; // The Time of the Server
     int countMove = 0;
-    Socket* socket = new Udp(1, atoi(argv[1]));
-    socket->initialize();
+    //Socket* socket = new Udp(1, atoi(argv[1]));
+    //socket->initialize();
 
 
     string input = "";
@@ -177,7 +177,9 @@ int main(int argc, char *argv[]){
         if(input == "1") {
             cin >> input;
             int numberOfDrivers = stoi(input);
-
+            cin >>format;
+            helperAddDriver(format, center);
+            /*
             while (numberOfDrivers > 0) {
                 //cin >> format;
                 char buffer[1024];
@@ -186,8 +188,9 @@ int main(int argc, char *argv[]){
                 string format(buffer);
                 helperAddDriver(format, center);
                 numberOfDrivers--;
-            }
 
+            }
+*/
         }
         if(input == "2")
         {
@@ -215,21 +218,14 @@ int main(int argc, char *argv[]){
             break;
         }
 
-        if(input == "9" && countMove != 0)
-        {
-            clock += 1;
-            cout << "Time: " << clock << endl;
-            center->moveTheCab(clock);
-
-        }
-        if(input == "9" && countMove == 0)
+        if(input == "9" )
         {
             countMove++;
             clock += 1;
             cout << "Time: " << clock << endl;
             center->startDriving(clock);
             center->moveTheCab(clock);
-
+            center->deleteTrip();
         }
 
 

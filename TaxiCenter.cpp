@@ -182,10 +182,10 @@ void TaxiCenter::moveTheCab(int time) {
          * move the driver.
          */
         if(itDriver->second->getTrip() != NULL) {
-            if(itDriver->second->getTrip()->getTime() == time){
+            if(itDriver->second->getTrip()->getStartTripDrivingTime() <= time){
                 int currentTime = itDriver->second->getTrip()->getTime();
                 int startTime = itDriver->second->getTrip()->getStartingTripTime();
-                if(currentTime != (startTime + this->tripDurance) - 1) {
+                if(currentTime != (startTime + this->tripDurance)) {
                     itDriver->second->move();
                 }
             }
@@ -214,7 +214,7 @@ void TaxiCenter::deleteTrip() {
             int currentTime = itDriver->second->getTrip()->getTime();
             int startTime = itDriver->second->getTrip()->getStartingTripTime();
             //if the trip passed its duarnce
-            if(currentTime == startTime + this->tripDurance){
+            if(currentTime == (startTime + this->tripDurance)){
                 //find the trip
                 std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
                 if (itDelete != this->trips->end()) {

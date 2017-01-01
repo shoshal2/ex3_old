@@ -19,6 +19,7 @@ private:
     int passengers;
     int startTime;
     int currentTime;
+    int startDrivingTime;
     double tarriff;
     bool hasADriver = false;
     int totalCurrent;
@@ -40,6 +41,7 @@ public:
     int getTotalMeters();
     int getTime();
     int getStartingTripTime();
+    int getStartTripDrivingTime();
     void updateTime();
     GridPoint* getStartPosition();
     GridPoint* getEndPosition();

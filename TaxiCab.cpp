@@ -3,6 +3,19 @@
 //
 
 #include "TaxiCab.h"
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 
 TaxiCab::TaxiCab(int id, int type, char manufacturer, char color){
     this->taxiNumber = id;
@@ -11,7 +24,6 @@ TaxiCab::TaxiCab(int id, int type, char manufacturer, char color){
     this->color = color;
     this->metersPassed = 0;
     this->tariff = 0;
-
     this->speed = 0;
 }
 

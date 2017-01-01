@@ -58,7 +58,7 @@ void helperAddDriver(string str, TaxiCenter* center){
 
 
 // take the input string and add a new Trip to taxiCanter
-void helperAddTrip(string str, TaxiCenter* center){
+void helperAddTrip(string str, TaxiCenter* center, Grid * g){
 
     int id;
     int xStart;
@@ -88,7 +88,7 @@ void helperAddTrip(string str, TaxiCenter* center){
     ss >> tarriff;
     ss >> time;
 
-    center->insertTrip(id, xStart, yStart, xEnd, yEnd ,passenger, tarriff, time);
+    center->insertTrip(id, xStart, yStart, xEnd, yEnd ,passenger, tarriff, time, g);
 
 }
 
@@ -137,6 +137,7 @@ int main(int argc, char *argv[]){
     int x;
     int y;
     int numOfObstacles;
+    Obstacle * obstacle;
 
     // get the size of the grid
     //cin >> input;
@@ -150,7 +151,7 @@ int main(int argc, char *argv[]){
     // get the size of the obstacles
     cin >> numOfObstacles;
     if(numOfObstacles > 0) {
-        Obstacle * obstacle = new Obstacle();
+        obstacle = new Obstacle();
 
         int i;
         for(i = 0; i < numOfObstacles; i++){
@@ -191,7 +192,9 @@ int main(int argc, char *argv[]){
         if(input == "2")
         {
             cin >> format;
-            helperAddTrip(format, center);
+            Grid * g = new Grid(xSize, ySize, obstacle);
+
+            helperAddTrip(format, center, g);
 
         }
         if(input == "3")
@@ -205,11 +208,6 @@ int main(int argc, char *argv[]){
             int id =0;
             cin >> id;
             center->getDriverLocation(id);
-        }
-        if(input == "6")
-        {
-
-            center->startDriving();
         }
 
         if(input == "7")

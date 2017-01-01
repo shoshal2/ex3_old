@@ -21,16 +21,16 @@ private:
     int currentTime;
     double tarriff;
     bool hasADriver = false;
-    Grid * grid;
     int totalCurrent;
     GridPoint* startPoint;
     GridPoint* endPoint;
     GridPoint* currentPoint;
     stack<GridPoint*> stk;
     bfs b;
+    Grid * grid;
 
 public:
-    Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time);
+    Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time, Grid * g);
     ~Trip();
     GridPoint * move(int meters);
     int GetTripNumber();

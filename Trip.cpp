@@ -4,7 +4,7 @@
 
 #include "Trip.h"
 #include "GridPoint.h"
-Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time) {
+Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time,  Grid * g) {
     this->tripId = id;
     this->startTime = time;
     this->tripNumber = id;
@@ -14,6 +14,8 @@ Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, dou
     this->passengers = passenger;
     this->tarriff = tarriff;
     totalCurrent = 0;
+    this->grid = g;
+    getBFS(this->startPoint, this->endPoint, this->grid);
 }
 
 

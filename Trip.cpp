@@ -38,7 +38,6 @@ GridPoint * Trip::move(int meters)
             break;
         }
         gp = stk.top();
-        gp->print();
         stk.pop();
         i++;
     }
@@ -81,6 +80,9 @@ int Trip::getStartingTripTime() {
     return this->startTime;
 }
 
+int Trip::getStartTripDrivingTime(){
+    return (this->startTime + 1);
+}
 /**
  * the mthod return the trips tariff
  * @return tarriff

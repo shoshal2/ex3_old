@@ -209,7 +209,6 @@ int main(){
         if(input == "6")
         {
 
-            center->startDriving();
         }
 
         if(input == "7")
@@ -218,6 +217,7 @@ int main(){
         }
         if(input == "9")
         {
+            center->startDriving(clock);
             clock += 1;
             cout << "Time: " << clock << endl;
         }

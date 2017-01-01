@@ -20,6 +20,7 @@ private:
     int startTime;
     int currentTime;
     double tarriff;
+    bool hasADriver = false;
     Grid * grid;
     int totalCurrent;
     GridPoint* startPoint;
@@ -42,7 +43,8 @@ public:
     void updateTime();
     GridPoint* getStartPosition();
     GridPoint* getEndPosition();
-
+    void setTripHasADriver();
+    bool tripHasADriver();
     bool operator == (const Trip& other) const;
     bool operator != (const Trip& other) const;
 

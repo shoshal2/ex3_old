@@ -129,7 +129,7 @@ void TaxiCenter::getDriverLocation(int id) {
  * the method that starts the actual driving: the method assigns the driver
  * to its trip and taxi.
  */
-void TaxiCenter::startDriving(){
+void TaxiCenter::startDriving(int time){
     std::map<int, Trip*>::iterator itTrip = trips->begin();
 
     std::map<int, Driver*>::iterator itDriver = drivers->begin();
@@ -137,26 +137,35 @@ void TaxiCenter::startDriving(){
 
     //loop over the trips, and assign to every trip a driver in the locaion.
     while (itTrip != trips->end()) {
-        //starting point of a trip
-        GridPoint * gp = itTrip->second->getStartPosition();
-        int cabID = 0;
-        int driverId = 0;
+        // if the trip was not assign to a driver
+        if(itTrip->second->tripHasADriver() == false) {
+            //if the time of the trip arrived
+            if(itTrip->second->getTime() == time){
+                //starting point of a trip
+                GridPoint * gp = itTrip->second->getStartPosition();
+                int cabID = 0;
+                int driverId = 0;
 
-        while(itDriver != drivers->end()) {
-            GridPoint * dgp = itDriver->second->getPosition();
-            if(*dgp == *gp) {
+                while(itDriver != drivers->end()) {
+                    GridPoint * dgp = itDriver->second->getPosition();
+                    if(*dgp == *gp) {
 
-                // find the cab and assig it to the driver
-                cabID = itDriver->second->getVahicleId();
-                std::map<int,TaxiCab*>::iterator it = cabs->find(cabID);
-                if (it != this->cabs->end()) {
-                    itDriver->second->addTaxi(it->second);
+                        // find the cab and assig it to the driver
+                        cabID = itDriver->second->getVahicleId();
+                        std::map<int,TaxiCab*>::iterator it = cabs->find(cabID);
+                        if (it != this->cabs->end()) {
+                            itDriver->second->addTaxi(it->second);
+                        }
+                    }
+                    itDriver++;
                 }
             }
-            itDriver++;
+            //the trip now has a driver
+            itTrip->second->setTripHasADriver();
         }
         itTrip++;
-    }
+        }
+
 }
 
 /**

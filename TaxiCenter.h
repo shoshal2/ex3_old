@@ -42,7 +42,7 @@ public:
     void insertTaxi(int id, int type, char manufacturer, char color);
     void editDriverLocation(int id, GridPoint * gp);
     void getDriverLocation(int id); // print (x,y)
-    void startDriving();
+    void startDriving(int time);
     void moveTheCab(int time);
     void deleteTrip();
     void exit();

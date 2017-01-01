@@ -91,6 +91,13 @@ int Trip::getTripId() {
     return this->tripId;
 }
 
+bool Trip::tripHasADriver() {
+    return this->hasADriver;
+}
+
+void Trip::setTripHasADriver() {
+    this->hasADriver = true;
+}
 /**
  * the method returns the number of passengers
  * @return

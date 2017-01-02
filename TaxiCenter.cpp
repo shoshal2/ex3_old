@@ -150,7 +150,7 @@ void TaxiCenter::startDriving(int time){
                     GridPoint * dgp = itDriver->second->getPosition();
                     if(*dgp == *gp) {
 
-                        // find the cab and assig it to the driver
+                        // find the cab and assign it to the driver
                         cabID = itDriver->second->getVahicleId();
                         std::map<int,TaxiCab*>::iterator it = cabs->find(cabID);
                         if (it != this->cabs->end()) {

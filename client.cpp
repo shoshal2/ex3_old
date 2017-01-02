@@ -4,7 +4,7 @@
 
 #include "client.h"
 
-int mains(int argc, char *argv[]) {
+int mainC(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
     //cout << argv[1] << endl;

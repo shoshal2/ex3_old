@@ -19,6 +19,18 @@ Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, dou
     getBFS(this->startPoint, this->endPoint, this->grid);
 }
 
+Trip::Trip() {
+    this->tripId = -1;
+    this->startTime = -1;
+    this->currentTime = -1;
+    this->tripNumber = 0;
+    this->startPoint = new GridPoint(0, 0);
+    this->endPoint = new GridPoint(0, 0);
+    this->currentPoint = new GridPoint(0, 0);
+    this->passengers = 0;
+    this->tarriff = 0;
+    totalCurrent = 0;
+}
 
 Trip::~Trip() {
     delete startPoint;

@@ -10,9 +10,23 @@
 #include "Obstacle.h"
 #include <iostream>
 #include <string>
+#include "Driver.h"
+#include "Trip.h"
+#include "TaxiCab.h"
+#include <fstream>
 #include <sstream>
-
-
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#define tripDurance = 5;
 #include "src/Udp.h"
 #include <unistd.h>
 using namespace std;
@@ -20,12 +34,19 @@ using namespace std;
 
 // take the input string and add a new driver to taxiCanter
 void helperAddDriver(string str, TaxiCenter* center);
+
 // take the input string and add a new Trip to taxiCanter
 void helperAddTrip(string str, TaxiCenter* center);
+
 // take the input string and add a new Taxi to taxiCanter
 void helperAddTaxi(string str, TaxiCenter* center);
 
-
+/**
+ * the method sends the position of the driver to the client
+ * (the trip information)
+ * @param center
+ */
+void sendPositionToClient(TaxiCenter* center, int time);
 
 // take the input string and add a new driver to taxiCanter
 void helperAddDriver(string str, TaxiCenter* center){
@@ -55,7 +76,6 @@ void helperAddDriver(string str, TaxiCenter* center){
 
     center->insertDriver(id, age, status, experience, vahicleId);
 }
-
 
 // take the input string and add a new Trip to taxiCanter
 void helperAddTrip(string str, TaxiCenter* center, Grid * g){
@@ -92,7 +112,6 @@ void helperAddTrip(string str, TaxiCenter* center, Grid * g){
 
 }
 
-
 // take the input string and add a new Taxi to taxiCanter
 void helperAddTaxi(string str, TaxiCenter* center){
 
@@ -119,6 +138,45 @@ void helperAddTaxi(string str, TaxiCenter* center){
 
     center->insertTaxi(id, type, manufacturer, color);
 }
+
+/**
+ * the method sends the position of the driver to the client
+ * (the trip information)
+ * @param center
+ */
+void sendPositionToClient(TaxiCenter* center, int time) {
+    std::string serial_str;
+    Udp udp(1, 5555);
+    udp.initialize();
+    GridPoint * gp;
+    std::map<int, Driver*>::iterator itDriver = center->getDrivers()->begin();
+    while(itDriver != center->getDrivers()->end()) {
+        /*
+         * if the time of the driver's trip equals to the method's time,
+         * the driver moved.
+         */
+        if(itDriver->second->getTrip() != NULL) {
+            if(itDriver->second->getTrip()->getStartTripDrivingTime() <= time){
+                int currentTime = itDriver->second->getTrip()->getTime();
+                int startTime = itDriver->second->getTrip()->getStartingTripTime();
+                if(currentTime != startTime + 5) {
+                    udp.initialize();
+                    gp = itDriver->second->getPosition();
+                    boost::iostreams::back_insert_device<std::string> inserter(serial_str);
+                    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+                    boost::archive::binary_oarchive oa(s);
+                    oa << gp;
+                    s.flush();
+
+                    udp.sendData(serial_str);
+                }
+            }
+        }
+        //get the next driver
+        itDriver++;
+    }
+}
+
 
 int main(int argc, char *argv[]){
     std::cout << "Hello, from server\n" << std::endl;
@@ -175,9 +233,33 @@ int main(int argc, char *argv[]){
     while(input != "7"){
 
         if(input == "1") {
+
             cin >> input;
             int numberOfDrivers = stoi(input);
+
+            /*
+             * get the driver from the client
+             */
+            Udp udp(1, 5555);
+            udp.initialize();
+
+            char buffer[1024];
+            udp.reciveData(buffer, sizeof(buffer));
+            cout << buffer << endl;
+            udp.sendData("sup?");
+
+            std::string serial_str;
+
+            Driver * driverFromClient;
+            boost::iostreams::basic_array_source<char> device(buffer, sizeof(buffer));
+            boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
+            boost::archive::binary_iarchive ia(s2);
+            ia >> driverFromClient;
+
+            cin >> input;
+
             cin >>format;
+            //maybe change the helperadddriver function? to receieve a driver
             helperAddDriver(format, center);
             /*
             while (numberOfDrivers > 0) {
@@ -188,9 +270,28 @@ int main(int argc, char *argv[]){
                 string format(buffer);
                 helperAddDriver(format, center);
                 numberOfDrivers--;
-
             }
 */
+            /*
+             * send the taxi to the client
+             */
+
+            //look for the taxi with the id
+            int cabID = driverFromClient->getVahicleId();
+            TaxiCab * cab;
+            std::map<int,TaxiCab*>::iterator it = center->getCabs()->find(cabID);
+            if (it != center->getCabs()->end()) {
+                cab = it->second;
+            }
+            boost::iostreams::back_insert_device<std::string> inserter(serial_str);
+            boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+            boost::archive::binary_oarchive oa(s);
+            oa << cab;
+            s.flush();
+
+            udp.initialize();
+            udp.sendData(serial_str);
+
         }
         if(input == "2")
         {
@@ -223,11 +324,15 @@ int main(int argc, char *argv[]){
             countMove++;
             clock += 1;
             cout << "Time: " << clock << endl;
+            // see if there are trips to be assigned
             center->startDriving(clock);
+            // see if there are drivers to be moves
             center->moveTheCab(clock);
+            // see if there are trips to be deleted
             center->deleteTrip();
+            //send to the client any movements of the drivers
+            sendPositionToClient(center, clock);
         }
-
 
         cin >> input;
     }

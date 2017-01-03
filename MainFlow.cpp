@@ -27,7 +27,6 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/export.hpp>
-#define tripDurance = 5;
 #include "src/Udp.h"
 #include <unistd.h>
 using namespace std;

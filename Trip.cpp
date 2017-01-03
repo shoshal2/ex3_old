@@ -16,6 +16,7 @@ Trip::Trip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, dou
     this->tarriff = tarriff;
     totalCurrent = 0;
     this->grid = g;
+    this->hasADriver = false;
     getBFS(this->startPoint, this->endPoint, this->grid);
 }
 
@@ -30,6 +31,7 @@ Trip::Trip() {
     this->passengers = 0;
     this->tarriff = 0;
     totalCurrent = 0;
+    this->hasADriver = false;
 }
 
 Trip::~Trip() {

@@ -49,7 +49,7 @@ private:
     int currentTime;
     int startDrivingTime;
     double tarriff;
-    bool hasADriver = false;
+    bool hasADriver;
     int totalCurrent;
     GridPoint* startPoint;
     GridPoint* endPoint;

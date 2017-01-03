@@ -44,7 +44,6 @@ private:
     bool visited;
     int x;
     int y;
-    int distanceFromStart[];
 
 
 public:

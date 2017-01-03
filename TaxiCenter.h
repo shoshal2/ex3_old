@@ -4,7 +4,7 @@
 
 #ifndef EX3_TAXICENTER_H
 #define EX3_TAXICENTER_H
-
+#define tripDurance 5
 
 #include <cstddef>
 #include <map>
@@ -21,7 +21,6 @@ private:
     map<int,TaxiCab*>* cabs;
     map<int,Trip*> *trips;
     map<int,GridPoint> location;
-    int tripDurance = 5;
 
 public:
 //    map<int,Driver*>* drivers;

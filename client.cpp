@@ -22,7 +22,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/export.hpp>
-#include "src/Udp.h"
+#include "Udp.h"
 #include <unistd.h>
 
 
@@ -61,7 +61,7 @@ Driver* helperAddDriver(string str){
 //BOOST_CLASS_EXPORT_GUID(StandardCab, "StandardCab");
 //BOOST_CLASS_EXPORT_GUID(LuxuryCab, "LuxuryCab");
 
-int mains(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
     string input = "";

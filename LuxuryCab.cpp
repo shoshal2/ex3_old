@@ -43,4 +43,4 @@ bool LuxuryCab::operator != (const LuxuryCab& other) const{
 
 LuxuryCab::~LuxuryCab (){}
 
-BOOST_CLASS_EXPORT(LuxuryCab);
+BOOST_CLASS_EXPORT(LuxuryCab)

@@ -47,4 +47,4 @@ bool StandardCab::operator != (const StandardCab& other) const{
 
 StandardCab::~StandardCab(){}
 
-BOOST_CLASS_EXPORT(StandardCab);
+BOOST_CLASS_EXPORT(StandardCab)

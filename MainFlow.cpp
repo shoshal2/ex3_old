@@ -194,7 +194,7 @@ int main(int argc, char *argv[]){
     int clock = 0; // The Time of the Server
 
     //Socket* socket = new Udp(1, 6640);
-    Socket* socket = new Udp(1, atoi(argv[1]));
+    Socket* socket = new Udp(1, atoi(argv[2]), "127.0.0.1");
     socket->initialize();
 
     string input = "";

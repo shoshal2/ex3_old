@@ -17,7 +17,7 @@ public:
     * The output: none										               *
     * The Function operation: creating new Udp						       *
     ***********************************************************************/
-    Udp(bool isServers, int port_num, string ip_num = IP);
+    Udp(bool isServers, int port_num, string ip_num);
     /***********************************************************************
     * function name: ~Udp												   *
     * The Input: none													   *

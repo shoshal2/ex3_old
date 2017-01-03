@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 
     string input = "";
     //Udp udp(0, 6639);
-    Udp udp(0, atoi(argv[1]));
+    Udp udp(0, atoi(argv[2]), argv[1]);
     udp.initialize();
 
     Driver *driver;

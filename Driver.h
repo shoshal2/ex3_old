@@ -44,7 +44,7 @@ class Driver {
         ar & status;
         ar & satisfaction;
         ar & costumers;
-        ar & taxi;
+        //ar & taxi;
         ar & position;
         //ar & trip;
     }

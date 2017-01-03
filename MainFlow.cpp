@@ -29,6 +29,8 @@
 #include <boost/serialization/export.hpp>
 #include "Udp.h"
 #include <unistd.h>
+
+
 using namespace std;
 
 
@@ -190,7 +192,7 @@ int main(int argc, char *argv[]){
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
-    int countMove = 0;
+
     //Socket* socket = new Udp(1, 6640);
     Socket* socket = new Udp(1, atoi(argv[1]));
     socket->initialize();
@@ -242,7 +244,10 @@ int main(int argc, char *argv[]){
         if(input == "1") {
 
             cin >> input;
-            int numberOfDrivers = stoi(input);
+            int numberOfDrivers;
+            stringstream ss(input);
+            ss >> numberOfDrivers;
+            //int numberOfDrivers = stoi(input);
 
             char buffer[2048];
             socket->reciveData(buffer, sizeof(buffer));
@@ -322,7 +327,8 @@ int main(int argc, char *argv[]){
 
         if(input == "9" )
         {
-            countMove++;
+
+
             clock += 1;
             cout << "Time: " << clock << endl;
             // see if there are trips to be assigned

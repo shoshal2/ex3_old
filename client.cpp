@@ -61,7 +61,7 @@ Driver* helperAddDriver(string str){
 //BOOST_CLASS_EXPORT_GUID(StandardCab, "StandardCab");
 //BOOST_CLASS_EXPORT_GUID(LuxuryCab, "LuxuryCab");
 
-int main(int argc, char *argv[]) {
+int mains(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
     string input = "";

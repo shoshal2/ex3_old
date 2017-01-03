@@ -214,8 +214,14 @@ void TaxiCenter::deleteTrip() {
              */
             int currentTime = itDriver->second->getTrip()->getTime();
             int startTime = itDriver->second->getTrip()->getStartingTripTime();
-            //if the trip passed its duarnce
-            if(currentTime == (startTime + tripDurance)){
+            GridPoint * gp1 = itDriver->second->getTrip()->getEndPosition();
+            GridPoint * gp2 = itDriver->second->getPosition();
+            /*
+             * if the trip passed its duarnce or if the driver arrived to the
+             * ending point of the trip
+             */
+            if(currentTime == (startTime + tripDurance) ||
+                    ((gp1->getX() == gp2->getX()) && (gp1->getY() == gp2->getY()))){
                 //find the trip
                 std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
                 if (itDelete != this->trips->end()) {
@@ -224,6 +230,19 @@ void TaxiCenter::deleteTrip() {
                     itDriver->second->addTrip(NULL);
                 }
             }
+            /*
+            if(gp1->getX() == gp2->getX()){
+                if(gp1->getY() == gp2->getY()) {
+                    //find the trip
+                    std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
+                    if (itDelete != this->trips->end()) {
+                        delete(itDelete->second);
+                        trips->erase(itDelete->first);
+                        itDriver->second->addTrip(NULL);
+                    }
+                }
+            }
+             */
         }
 
         //get the next driver

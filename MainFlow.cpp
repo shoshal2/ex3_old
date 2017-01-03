@@ -46,7 +46,7 @@ void helperAddTaxi(string str, TaxiCenter* center);
  * (the trip information)
  * @param center
  */
-void sendPositionToClient(TaxiCenter* center, int time);
+void sendPositionToClient(TaxiCenter* center, int time, Socket* soc);
 
 // take the input string and add a new driver to taxiCanter
 void helperAddDriver(string str, TaxiCenter* center){
@@ -144,10 +144,9 @@ void helperAddTaxi(string str, TaxiCenter* center){
  * (the trip information)
  * @param center
  */
-void sendPositionToClient(TaxiCenter* center, int time) {
+void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
     std::string serial_str;
-    Udp udp(1, 5555);
-    udp.initialize();
+
     GridPoint * gp;
     std::map<int, Driver*>::iterator itDriver = center->getDrivers()->begin();
     while(itDriver != center->getDrivers()->end()) {
@@ -160,7 +159,7 @@ void sendPositionToClient(TaxiCenter* center, int time) {
                 int currentTime = itDriver->second->getTrip()->getTime();
                 int startTime = itDriver->second->getTrip()->getStartingTripTime();
                 if(currentTime != startTime + 5) {
-                    udp.initialize();
+
                     gp = itDriver->second->getPosition();
                     boost::iostreams::back_insert_device<std::string> inserter(serial_str);
                     boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
@@ -168,7 +167,7 @@ void sendPositionToClient(TaxiCenter* center, int time) {
                     oa << gp;
                     s.flush();
 
-                    udp.sendData(serial_str);
+                    soc->sendData(serial_str);
                 }
             }
         }
@@ -178,14 +177,14 @@ void sendPositionToClient(TaxiCenter* center, int time) {
 }
 
 
-int main(int argc, char *argv[]){
+int mains(int argc, char *argv[]){
     std::cout << "Hello, from server\n" << std::endl;
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
     int countMove = 0;
-    //Socket* socket = new Udp(1, atoi(argv[1]));
-    //socket->initialize();
+    Socket* socket = new Udp(1, atoi(argv[1]));
+    socket->initialize();
 
 
     string input = "";
@@ -237,16 +236,12 @@ int main(int argc, char *argv[]){
             cin >> input;
             int numberOfDrivers = stoi(input);
 
-            /*
-             * get the driver from the client
-             */
-            Udp udp(1, 5555);
-            udp.initialize();
 
-            char buffer[1024];
-            udp.reciveData(buffer, sizeof(buffer));
+
+            char buffer[2048];
+            socket->reciveData(buffer, sizeof(buffer));
             cout << buffer << endl;
-            udp.sendData("sup?");
+
 
             std::string serial_str;
 
@@ -256,11 +251,12 @@ int main(int argc, char *argv[]){
             boost::archive::binary_iarchive ia(s2);
             ia >> driverFromClient;
 
-            cin >> input;
+            //cin >>format;
+            //helperAddDriver(format, center);
 
-            cin >>format;
-            //maybe change the helperadddriver function? to receieve a driver
-            helperAddDriver(format, center);
+            center->getDrivers()->insert(std::pair<int,Driver*>(driverFromClient->getId(), driverFromClient));
+
+
             /*
             while (numberOfDrivers > 0) {
                 //cin >> format;
@@ -289,8 +285,7 @@ int main(int argc, char *argv[]){
             oa << cab;
             s.flush();
 
-            udp.initialize();
-            udp.sendData(serial_str);
+            socket->sendData(serial_str);
 
         }
         if(input == "2")
@@ -331,7 +326,7 @@ int main(int argc, char *argv[]){
             // see if there are trips to be deleted
             center->deleteTrip();
             //send to the client any movements of the drivers
-            sendPositionToClient(center, clock);
+            sendPositionToClient(center, clock, socket);
         }
 
         cin >> input;

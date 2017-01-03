@@ -32,7 +32,7 @@ class Trip {
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version)
     {
-        ar & tripId;
+        ar & tripNumber;
         ar & startPoint;
         ar & endPoint;
         ar & passengers;

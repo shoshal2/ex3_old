@@ -28,10 +28,10 @@ TaxiCab::TaxiCab(int id, int type, char manufacturer, char color){
 }
 
 TaxiCab::TaxiCab(){
-    this->taxiNumber = -1;
+    this->taxiNumber = 0;
     this->taxiType = 0;
-    this->manufacturer = 'H';
-    this->color = 'B';
+    this->manufacturer = 'c';
+    this->color = 'c';
     this->metersPassed = 0;
     this->tariff = 0;
     this->speed = 0;

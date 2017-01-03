@@ -11,6 +11,10 @@ LuxuryCab::LuxuryCab(int id, int type, char manufacturer, char color) : TaxiCab(
     this->speed = 2;
 }
 
+LuxuryCab::LuxuryCab() : TaxiCab(){
+    this->speed = 2;
+}
+
 /**
  * the method returns the speed of the LuxuryCab
  * @return speed
@@ -38,3 +42,5 @@ bool LuxuryCab::operator != (const LuxuryCab& other) const{
 }
 
 LuxuryCab::~LuxuryCab (){}
+
+BOOST_CLASS_EXPORT(LuxuryCab);

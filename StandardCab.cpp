@@ -14,7 +14,9 @@ StandardCab::StandardCab(int id, int type, char manufacturer, char color) : Taxi
     this->speed = 1;
 }
 
-
+StandardCab::StandardCab() : TaxiCab(){
+    this->speed = 1;
+}
 
 /**
  * the method returns the speed of the StandardCab
@@ -44,3 +46,5 @@ bool StandardCab::operator != (const StandardCab& other) const{
 }
 
 StandardCab::~StandardCab(){}
+
+BOOST_CLASS_EXPORT(StandardCab);

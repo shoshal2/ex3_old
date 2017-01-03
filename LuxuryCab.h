@@ -24,6 +24,7 @@ using namespace std;
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/export.hpp>
 
 
 class LuxuryCab : public TaxiCab{
@@ -39,6 +40,7 @@ class LuxuryCab : public TaxiCab{
 
 public:
     LuxuryCab(int id, int type, char manufacturer, char color);
+    LuxuryCab();
     ~LuxuryCab ();
     int getFast();
 

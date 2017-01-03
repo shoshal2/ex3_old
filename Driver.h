@@ -46,7 +46,7 @@ class Driver {
         ar & costumers;
         ar & taxi;
         ar & position;
-        ar & trip;
+        //ar & trip;
     }
 
 private :

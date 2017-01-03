@@ -26,6 +26,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/export.hpp>
 #define tripDurance = 5;
 #include "src/Udp.h"
 #include <unistd.h>
@@ -145,7 +146,8 @@ void helperAddTaxi(string str, TaxiCenter* center){
  * @param center
  */
 void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
-    std::string serial_str;
+
+    std::string serial_server_position_str;
 
     GridPoint * gp;
     std::map<int, Driver*>::iterator itDriver = center->getDrivers()->begin();
@@ -155,19 +157,24 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
          * the driver moved.
          */
         if(itDriver->second->getTrip() != NULL) {
+
             if(itDriver->second->getTrip()->getStartTripDrivingTime() <= time){
+
                 int currentTime = itDriver->second->getTrip()->getTime();
                 int startTime = itDriver->second->getTrip()->getStartingTripTime();
-                if(currentTime != startTime + 5) {
+                if(currentTime != startTime + 6) {
+
+                    cout << "sending info to client" << endl;
 
                     gp = itDriver->second->getPosition();
-                    boost::iostreams::back_insert_device<std::string> inserter(serial_str);
-                    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-                    boost::archive::binary_oarchive oa(s);
-                    oa << gp;
-                    s.flush();
+                    gp->print();
+                    boost::iostreams::back_insert_device<std::string> inserterPosition(serial_server_position_str);
+                    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > sServerPosition(inserterPosition);
+                    boost::archive::binary_oarchive oaServerPosition(sServerPosition);
+                    oaServerPosition << gp;
+                    sServerPosition.flush();
 
-                    soc->sendData(serial_str);
+                    soc->sendData(serial_server_position_str);
                 }
             }
         }
@@ -176,16 +183,18 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
     }
 }
 
+//BOOST_CLASS_EXPORT_GUID(StandardCab, "StandardCab");
+//BOOST_CLASS_EXPORT_GUID(LuxuryCab, "LuxuryCab");
 
-int mains(int argc, char *argv[]){
+int main(int argc, char *argv[]){
     std::cout << "Hello, from server\n" << std::endl;
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
     int countMove = 0;
+    //Socket* socket = new Udp(1, 6640);
     Socket* socket = new Udp(1, atoi(argv[1]));
     socket->initialize();
-
 
     string input = "";
     string format;
@@ -236,20 +245,15 @@ int mains(int argc, char *argv[]){
             cin >> input;
             int numberOfDrivers = stoi(input);
 
-
-
             char buffer[2048];
             socket->reciveData(buffer, sizeof(buffer));
-            cout << buffer << endl;
-
-
-            std::string serial_str;
+            //cout << buffer << endl;
 
             Driver * driverFromClient;
-            boost::iostreams::basic_array_source<char> device(buffer, sizeof(buffer));
-            boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
-            boost::archive::binary_iarchive ia(s2);
-            ia >> driverFromClient;
+            boost::iostreams::basic_array_source<char> deviceServerDriver(buffer, sizeof(buffer));
+            boost::iostreams::stream<boost::iostreams::basic_array_source<char> > sServerDriver(deviceServerDriver);
+            boost::archive::binary_iarchive iaServerDriver(sServerDriver);
+            iaServerDriver >> driverFromClient;
 
             //cin >>format;
             //helperAddDriver(format, center);
@@ -272,6 +276,8 @@ int mains(int argc, char *argv[]){
              * send the taxi to the client
              */
 
+            std::string serial_server_cab_str;
+
             //look for the taxi with the id
             int cabID = driverFromClient->getVahicleId();
             TaxiCab * cab;
@@ -279,13 +285,13 @@ int mains(int argc, char *argv[]){
             if (it != center->getCabs()->end()) {
                 cab = it->second;
             }
-            boost::iostreams::back_insert_device<std::string> inserter(serial_str);
-            boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-            boost::archive::binary_oarchive oa(s);
-            oa << cab;
-            s.flush();
+            boost::iostreams::back_insert_device<std::string> inserterServerCab(serial_server_cab_str);
+            boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > sServerCab(inserterServerCab);
+            boost::archive::binary_oarchive oaServerCab(sServerCab);
+            oaServerCab << cab;
+            sServerCab.flush();
 
-            socket->sendData(serial_str);
+            socket->sendData(serial_server_cab_str);
 
         }
         if(input == "2")
@@ -311,6 +317,7 @@ int mains(int argc, char *argv[]){
 
         if(input == "7")
         {
+            socket->sendData("7");
             break;
         }
 
@@ -323,15 +330,16 @@ int mains(int argc, char *argv[]){
             center->startDriving(clock);
             // see if there are drivers to be moves
             center->moveTheCab(clock);
-            // see if there are trips to be deleted
-            center->deleteTrip();
             //send to the client any movements of the drivers
             sendPositionToClient(center, clock, socket);
+            // see if there are trips to be deleted
+            center->deleteTrip();
+
         }
 
         cin >> input;
     }
-
+    socket->sendData("7");
     delete(center);
     return 0;
 }

@@ -65,5 +65,5 @@ public:
     bool operator == (const TaxiCab& other) const;
     bool operator != (const TaxiCab& other) const;
 };
-
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(TaxiCab)
 #endif //EX3_TAXICAB_H

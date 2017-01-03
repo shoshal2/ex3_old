@@ -34,15 +34,9 @@ class GridPoint: public Point
     void serialize(Archive &ar, const unsigned int version)
     {
         ar & boost::serialization::base_object<Point>(*this);
-        ar & distance;
-        ar & visited;
         ar & x;
         ar & y;
-        ar & *parent;
-        ar & *neighbor1;
-        ar & *neighbor2;
-        ar & *neighbor3;
-        ar & *neighbor4;
+
     }
 
 private:

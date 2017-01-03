@@ -219,9 +219,7 @@ double Driver::getTariff() {
  * and the cab.
  */
 void Driver::move() {
-    cout << "move 1" << endl;
     this->setPosition(this->trip->move(this->taxi->getFast()));
-    cout << "move 2" << endl;
 }
 
 /**

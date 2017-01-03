@@ -8,7 +8,22 @@
 #include "TaxiCab.h"
 #include "LuxuryCab.h"
 #include "StandardCab.h"
-
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/export.hpp>
+#include "src/Udp.h"
+#include <unistd.h>
 
 
 
@@ -43,13 +58,14 @@ Driver* helperAddDriver(string str){
 
 
 
+//BOOST_CLASS_EXPORT_GUID(StandardCab, "StandardCab");
+//BOOST_CLASS_EXPORT_GUID(LuxuryCab, "LuxuryCab");
 
-
-int main(int argc, char *argv[]) {
+int mains(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
-
     string input = "";
+    //Udp udp(0, 6639);
     Udp udp(0, atoi(argv[1]));
     udp.initialize();
 
@@ -57,51 +73,53 @@ int main(int argc, char *argv[]) {
     GridPoint *point;
     TaxiCab* cab;
 
-
-
-
     cin >> input;
     driver = helperAddDriver(input);
 
 
-    std::string serial_str;
-    boost::iostreams::back_insert_device<std::string> inserter(serial_str);
+    std::string serial_client_driver_str;
+    boost::iostreams::back_insert_device<std::string> inserter(serial_client_driver_str);
     boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
     boost::archive::binary_oarchive oa(s);
     oa << driver;
     s.flush();
 
-    udp.sendData(serial_str);
-
+    udp.sendData(serial_client_driver_str);
 
 
 
     char buffer2[2048];
     udp.reciveData(buffer2, sizeof(buffer2));
-    string cab_str(buffer2);
-    cout << buffer2 << endl;
+    //string cab_str(buffer2);
+    //cout << buffer2 << endl;
 
-    boost::iostreams::basic_array_source<char> device2(cab_str.c_str(), cab_str.size());
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device2);
-    boost::archive::binary_iarchive ia2(s2);
-    ia2 >> cab;
+    std::string serial_cab_str;
 
+    boost::iostreams::basic_array_source<char> deviceClientCab(buffer2, sizeof(buffer2));
+    boost::iostreams::stream<boost::iostreams::basic_array_source<char> > sClientCab(deviceClientCab);
+    boost::archive::binary_iarchive iaClientCab(sClientCab);
+    iaClientCab >> cab;
 
-
-
+    /*
+     * the trip in this case is the path the driver needs to follow.
+     * meaning: the client recieves the points of the path, as long as the
+     * trip continues.
+     */
     while(true) {
-        char buffer1[2048];
-        udp.reciveData(buffer1, sizeof(buffer1));
-        string point_str(buffer1);
-        cout << buffer1 << endl;
+        char buffer3[2048];
+        udp.reciveData(buffer3, sizeof(buffer3));
+        //string point_str(buffer3);
 
-        if(point_str == "7")
+        if(buffer3[0] == '7')
             break;
 
-        boost::iostreams::basic_array_source<char> device1(point_str.c_str(), point_str.size());
-        boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s1(device1);
-        boost::archive::binary_iarchive ia1(s1);
-        ia1 >> point;
+        boost::iostreams::basic_array_source<char> deviceClientPoint(buffer3, sizeof(buffer3));
+        boost::iostreams::stream<boost::iostreams::basic_array_source<char> > sClientPoint(deviceClientPoint);
+        boost::archive::binary_iarchive iaClientPoint(sClientPoint);
+        iaClientPoint >> point;
+        cout << "client in point: " << endl;
+        point->print();
+
     }
 
 

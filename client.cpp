@@ -57,15 +57,11 @@ Driver* helperAddDriver(string str){
 }
 
 
-
-//BOOST_CLASS_EXPORT_GUID(StandardCab, "StandardCab");
-//BOOST_CLASS_EXPORT_GUID(LuxuryCab, "LuxuryCab");
-
-int mains(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
     string input = "";
-    //Udp udp(0, 6639);
+
     Udp udp(0, atoi(argv[2]), argv[1]);
     udp.initialize();
 
@@ -117,8 +113,8 @@ int mains(int argc, char *argv[]) {
         boost::iostreams::stream<boost::iostreams::basic_array_source<char> > sClientPoint(deviceClientPoint);
         boost::archive::binary_iarchive iaClientPoint(sClientPoint);
         iaClientPoint >> point;
-        cout << "client in point: " << endl;
-        point->print();
+        //cout << "client in point: " << endl;
+        //point->print();
 
     }
 

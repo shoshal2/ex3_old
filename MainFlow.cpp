@@ -165,10 +165,10 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
                 int startTime = itDriver->second->getTrip()->getStartingTripTime();
                 if(currentTime != startTime + 6) {
 
-                    cout << "sending info to client" << endl;
+                    //cout << "sending info to client" << endl;
 
                     gp = itDriver->second->getPosition();
-                    gp->print();
+                    //gp->print();
                     boost::iostreams::back_insert_device<std::string> inserterPosition(serial_server_position_str);
                     boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > sServerPosition(inserterPosition);
                     boost::archive::binary_oarchive oaServerPosition(sServerPosition);
@@ -184,17 +184,13 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
     }
 }
 
-//BOOST_CLASS_EXPORT_GUID(StandardCab, "StandardCab");
-//BOOST_CLASS_EXPORT_GUID(LuxuryCab, "LuxuryCab");
-
-int main(int argc, char *argv[]){
-    std::cout << "Hello, from server\n" << std::endl;
+int mains(int argc, char *argv[]){
+    std::cout << "Hello, from server" << std::endl;
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
 
-    Socket* socket = new Udp(1, 6670, "127.0.0.1");
-    //Socket* socket = new Udp(1, atoi(argv[1]), "127.0.0.1");
+    Socket* socket = new Udp(1, atoi(argv[1]), "127.0.0.1");
     socket->initialize();
 
     string input = "";
@@ -207,7 +203,6 @@ int main(int argc, char *argv[]){
     Obstacle * obstacle;
 
     // get the size of the grid
-    //cin >> input;
     char gridSize[100];
     cin.getline(gridSize,sizeof(input));
 
@@ -330,7 +325,6 @@ int main(int argc, char *argv[]){
 
 
             clock += 1;
-            cout << "Time: " << clock << endl;
             // see if there are trips to be assigned
             center->startDriving(clock);
             // see if there are drivers to be moves
@@ -345,6 +339,7 @@ int main(int argc, char *argv[]){
         cin >> input;
     }
     socket->sendData("7");
+    delete(socket);
     delete(center);
     return 0;
 }

@@ -88,6 +88,7 @@ public:
     //neighbor to the 6 o'clock direction
     void setNeighbor4(GridPoint *gp);
     bool equalsTO(GridPoint * other);
+    string toString();
 
     bool operator==(const GridPoint & gp) const;
     bool operator<(const GridPoint & gp) const;

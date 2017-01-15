@@ -6,6 +6,7 @@
 #include "GridPoint.h"
 #include <iostream>
 #include "Point.h"
+#include <string>
 
 /**
  * the method returns the distance of the point from another point
@@ -23,6 +24,20 @@ int GridPoint::getDistance() {
 void GridPoint::setDistance(int num) {
     this->distance = num + 1;
 }
+
+
+string GridPoint::toString(){
+    string xx;
+    stringstream ss1;
+    ss1 << x;
+
+    string yy;
+    stringstream ss2;
+    ss2 << y;
+
+    return "(" + ss1.str() + "," + ss2.str() + ")";
+}
+
 
 /**
  * @return true if the point was visited before.

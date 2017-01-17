@@ -41,6 +41,15 @@ struct arg_struct {
     Socket* server;
 };
 
+// Multiple arguments to function called by pthread_create()
+struct arg_struct_trip {
+    int xSize;
+    int ySize;
+    Obstacle * obstacle;
+    TaxiCenter* center;
+    string format;
+};
+
 // take the input string and add a new driver to taxiCanter
 void helperAddDriver(string str, TaxiCenter* center);
 
@@ -58,7 +67,7 @@ void helperAddTaxi(string str, TaxiCenter* center);
 void sendPositionToClient(TaxiCenter* center, int time, Socket* soc);
 
 // take the input string and add a new driver to taxiCanter
-void helperAddDriver(string str, TaxiCenter* center){
+void helperAddDriver(string str, TaxiCenter* center, int socId){
 
     int id;
     int age;
@@ -83,7 +92,7 @@ void helperAddDriver(string str, TaxiCenter* center){
     ss >> experience;
     ss >> vahicleId;
 
-    center->insertDriver(id, age, status, experience, vahicleId);
+    center->insertDriver(id, age, status, experience, vahicleId, socId);
 }
 
 // take the input string and add a new Trip to taxiCanter
@@ -153,7 +162,7 @@ void helperAddTaxi(string str, TaxiCenter* center){
  * (the trip information)
  * @param center
  */
-void sendPositionToClient(TaxiCenter* center, int time, Socket* soc, int id) {
+void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
 
     std::string serial_server_position_str;
 
@@ -170,11 +179,11 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc, int id) {
 
                 int currentTime = itDriver->second->getTrip()->getTime();
                 int startTime = itDriver->second->getTrip()->getStartingTripTime();
+                soc->sendData(itDriver->second->getPosition()->toString(), itDriver->second->getSocId());
+                /*
                 if(currentTime != startTime + 6) {
-
-                    cout << "sending info to client" << endl;
-                    soc->sendData(itDriver->second->getPosition()->toString(), id);
-
+                    soc->sendData(itDriver->second->getPosition()->toString(), itDriver->second->getSocId());
+*/
 //                    gp = itDriver->second->getPosition();
 //                    //gp->print();
 //                    boost::iostreams::back_insert_device<std::string> inserterPosition(serial_server_position_str);
@@ -184,7 +193,7 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc, int id) {
 //                    sServerPosition.flush();
 //
 //                    soc->sendData(serial_server_position_str);
-                }
+                //}
             }
         }
         //get the next driver
@@ -219,7 +228,7 @@ void *startNewClient(void *threadArg) {
 
     string format(buffer);
     TaxiCenter* center = dim->center;
-    helperAddDriver(format, center);
+    helperAddDriver(format, center, tid);
 
     mysocket->sendData("sending a Trip....", tid);
     //mysocket->sendData("7", tid);
@@ -234,7 +243,27 @@ void *startNewClient(void *threadArg) {
 }
 
 
+void *startNewTripThread(void *threadArg) {
+    std::cout << "Hello, from server function - start a new trip thread" << std::endl;
 
+    int tid;
+    struct arg_struct_trip* args = (struct arg_struct_trip*) threadArg;
+
+
+
+    TaxiCenter* center = args->center;
+    string format = args->format;
+    int xSize = args->xSize;
+    int ySize = args->ySize;
+    Obstacle* obstacle = args->obstacle;
+
+    Grid * g = new Grid(xSize, ySize, obstacle);
+
+    helperAddTrip(format, center, g);
+
+    cout << "pthread_exit , startNewTripThread" << endl;
+    pthread_exit(NULL);
+}
 
 
 
@@ -245,13 +274,14 @@ int main(int argc, char *argv[]){
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
-
+    //Socket* socket = new Tcp(1, 88900, "127.0.0.1");
     Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
     socket->initialize();
 
 
 
     pthread_t *threads;
+    pthread_t *threadTrip;
     int *threadsIdSockets;
 
 
@@ -262,7 +292,7 @@ int main(int argc, char *argv[]){
     int x;
     int y;
     int numOfObstacles;
-    Obstacle * obstacle;
+    Obstacle * obstacle = new Obstacle();
 
     // get the size of the grid
     char gridSize[100];
@@ -275,8 +305,6 @@ int main(int argc, char *argv[]){
     // get the size of the obstacles
     cin >> numOfObstacles;
     if(numOfObstacles > 0) {
-        obstacle = new Obstacle();
-
         int i;
         for(i = 0; i < numOfObstacles; i++){
             //get the obstacle's point
@@ -293,6 +321,8 @@ int main(int argc, char *argv[]){
             GridPoint * ob = new GridPoint(x,y);
             obstacle->addObstacle(ob);
         }
+
+        obstacle->setNotEmpty();
     }
 
     int numberOfDrivers;
@@ -395,15 +425,24 @@ int main(int argc, char *argv[]){
 */
 
 //            socket->sendData("send the taxi to the client");
+            input = "0";
 
         }
         if(input == "2")
         {
+            threadTrip = new pthread_t[1];
             cin >> format;
-            Grid * g = new Grid(xSize, ySize, obstacle);
-
-            helperAddTrip(format, center, g);
-
+            struct arg_struct_trip * args = (struct arg_struct_trip*)malloc(sizeof(struct arg_struct_trip));
+            args->center = center;
+            args->format = format;
+            args->xSize = xSize;
+            args->ySize = ySize;
+            args->obstacle = obstacle;
+            int rc = pthread_create(&threadTrip[0], NULL, startNewTripThread, (void *)args);
+            if (rc){
+                cout << "Error:unable to create thread," << rc << endl;
+                exit(-1);
+            }
         }
         if(input == "3")
         {
@@ -420,7 +459,6 @@ int main(int argc, char *argv[]){
 
         if(input == "7")
         {
-            flag = 0;
             break;
         }
 
@@ -433,12 +471,7 @@ int main(int argc, char *argv[]){
             center->startDriving(clock);
             // see if there are drivers to be moves
             center->moveTheCab(clock);
-            int k = 0;
-            while(k < numberOfDrivers){
-                //send to the client any movements of the drivers
-                sendPositionToClient(center, clock, socket, threadsIdSockets[k]);
-                socket->sendData("7",threadsIdSockets[k]);
-            }
+            sendPositionToClient(center, clock, socket);
 //            //send to the client any movements of the drivers
 //            sendPositionToClient(center, clock, socket);
             // see if there are trips to be deleted
@@ -449,10 +482,11 @@ int main(int argc, char *argv[]){
         cin >> input;
     }
 
-
+    flag = 0;
     int k = 0;
     while(k < numberOfDrivers){
         socket->sendData("7",threadsIdSockets[k]);
+        k++;
     }
     delete(socket);
     delete(center);

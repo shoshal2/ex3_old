@@ -51,6 +51,7 @@ class Driver {
 
 private :
     int id;
+    int socId;
     int age;
     int experience;
     int vahicleId;
@@ -90,6 +91,8 @@ public:
     Trip* getTrip();
     double getTariff();
     void move();
+    void setSocId(int id);
+    int getSocId();
     bool operator == (const Driver& other) const;
     bool operator != (const Driver& other) const;
 

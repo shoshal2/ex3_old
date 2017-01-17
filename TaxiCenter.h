@@ -36,7 +36,7 @@ public:
     TaxiCenter();
     ~TaxiCenter();
     //GridPoint * startLoctaion = new GridPoint(0,0);
-    void insertDriver(int id, int age,char status,  int experience, int vahicleId);
+    void insertDriver(int id, int age,char status,  int experience, int vahicleId, int socId);
     void insertTrip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff, int time, Grid * g);
     void insertTaxi(int id, int type, char manufacturer, char color);
     void editDriverLocation(int id, GridPoint * gp);

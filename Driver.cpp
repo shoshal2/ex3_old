@@ -222,6 +222,13 @@ void Driver::move() {
     this->setPosition(this->trip->move(this->taxi->getFast()));
 }
 
+void Driver::setSocId(int id) {
+    this->socId = id;
+}
+
+int Driver::getSocId() {
+    return this->socId;
+}
 /**
  * an override to the == operator.
  * @param other

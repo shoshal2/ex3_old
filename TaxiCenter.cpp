@@ -58,9 +58,10 @@ map<int,Trip*>* TaxiCenter::getTrips(){
  * @param experience
  * @param vahicleId
  */
-void TaxiCenter::insertDriver(int id, int age,char status,  int experience, int vahicleId) {
+void TaxiCenter::insertDriver(int id, int age,char status,  int experience, int vahicleId, int socId) {
 
     Driver* newDriver = new Driver(id,age,status,experience, vahicleId);
+    newDriver->setSocId(socId);
     drivers->insert ( std::pair<int,Driver*>(id,newDriver) );
     GridPoint * startLoctaion = new GridPoint(0,0);
     location.insert(std::pair<int,GridPoint>(id, *startLoctaion));
@@ -149,7 +150,7 @@ void TaxiCenter::startDriving(int time){
 
                 while(itDriver != drivers->end()) {
                     GridPoint * dgp = itDriver->second->getPosition();
-                    if(*dgp == *gp) {
+                    if((*dgp == *gp) && (itTrip->second->tripHasADriver() == false)) {
 
                         // find the cab and assign it to the driver
                         cabID = itDriver->second->getVahicleId();
@@ -158,6 +159,7 @@ void TaxiCenter::startDriving(int time){
                             itDriver->second->addTaxi(it->second);
                         }
                         itDriver->second->addTrip(itTrip->second);
+                        itTrip->second->setTripHasADriver();
                     }
                     itDriver++;
                 }
@@ -184,11 +186,14 @@ void TaxiCenter::moveTheCab(int time) {
          */
         if(itDriver->second->getTrip() != NULL) {
             if(itDriver->second->getTrip()->getStartTripDrivingTime() <= time){
-                int currentTime = itDriver->second->getTrip()->getTime();
-                int startTime = itDriver->second->getTrip()->getStartingTripTime();
+                itDriver->second->move();
+                //int currentTime = itDriver->second->getTrip()->getTime();
+                //int startTime = itDriver->second->getTrip()->getStartingTripTime();
+                /*
                 if(currentTime != (startTime + tripDurance)) {
                     itDriver->second->move();
                 }
+                 */
             }
             //update the trip's time
             itDriver->second->getTrip()->updateTime();
@@ -220,6 +225,16 @@ void TaxiCenter::deleteTrip() {
              * if the trip passed its duarnce or if the driver arrived to the
              * ending point of the trip
              */
+            if((gp1->getX() == gp2->getX()) && (gp1->getY() == gp2->getY())){
+                //find the trip
+                std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
+                if (itDelete != this->trips->end()) {
+                    delete(itDelete->second);
+                    trips->erase(itDelete->first);
+                    itDriver->second->addTrip(NULL);
+                }
+            }
+            /*
             if(currentTime == (startTime + tripDurance) ||
                     ((gp1->getX() == gp2->getX()) && (gp1->getY() == gp2->getY()))){
                 //find the trip
@@ -230,6 +245,7 @@ void TaxiCenter::deleteTrip() {
                     itDriver->second->addTrip(NULL);
                 }
             }
+             */
             /*
             if(gp1->getX() == gp2->getX()){
                 if(gp1->getY() == gp2->getY()) {

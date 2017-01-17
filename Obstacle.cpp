@@ -4,6 +4,9 @@
 
 #include "Obstacle.h"
 
+Obstacle::Obstacle() {
+    bool setIsEmpty = false;
+}
 /**
  * the method returns the obstacle set
  * @return obstacles.
@@ -38,6 +41,9 @@ void Obstacle::removeObstacle(GridPoint *gp) {
   * @return 1 if true. 0 otherwise.
   */
 bool Obstacle::obstacleAtPoint(GridPoint &gp) {
+    if(this->isEmpt()) {
+        return false;
+    }
     // Search for gp set using find member function (which returns an iterator)
     std::set<GridPoint>::iterator it = obstacles.find(gp);
 
@@ -49,6 +55,13 @@ bool Obstacle::obstacleAtPoint(GridPoint &gp) {
     }
 }
 
+void Obstacle::setNotEmpty() {
+    this->setIsEmpty = true;
+}
+
+bool Obstacle::isEmpt() {
+    return this->setIsEmpty;
+}
 /**
  * the method destroys the set.
  */

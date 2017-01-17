@@ -11,9 +11,11 @@
 class Obstacle {
 private:
     set <GridPoint> obstacles;
-
+    bool setIsEmpty;
 public:
-
+    Obstacle();
+    void setNotEmpty();
+    bool isEmpt();
     set <GridPoint> getObstacle();
     void addObstacle(const GridPoint * gp);
     void removeObstacle(GridPoint * gp);

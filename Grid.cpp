@@ -292,6 +292,9 @@ bool Grid::checkIfInGrid(GridPoint *gp) {
  * @return true if there is an obstacle
  */
 bool Grid::checkIfObstacle(GridPoint *gp) {
+    if(gridObstacles->isEmpt()) {
+        return false;
+    }
     if(gridObstacles->obstacleAtPoint(*gp) == 1){
         return true;
     }

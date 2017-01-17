@@ -180,20 +180,6 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
                 int currentTime = itDriver->second->getTrip()->getTime();
                 int startTime = itDriver->second->getTrip()->getStartingTripTime();
                 soc->sendData(itDriver->second->getPosition()->toString(), itDriver->second->getSocId());
-                /*
-                if(currentTime != startTime + 6) {
-                    soc->sendData(itDriver->second->getPosition()->toString(), itDriver->second->getSocId());
-*/
-//                    gp = itDriver->second->getPosition();
-//                    //gp->print();
-//                    boost::iostreams::back_insert_device<std::string> inserterPosition(serial_server_position_str);
-//                    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > sServerPosition(inserterPosition);
-//                    boost::archive::binary_oarchive oaServerPosition(sServerPosition);
-//                    oaServerPosition << gp;
-//                    sServerPosition.flush();
-//
-//                    soc->sendData(serial_server_position_str);
-                //}
             }
         }
         //get the next driver
@@ -201,35 +187,23 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
     }
 }
 
-
-int helperMain(TaxiCenter * center, Grid* grid, Socket* socket){
-
-}
-
-
 int flag = 1;
 
 void *startNewClient(void *threadArg) {
     std::cout << "Hello, from server startNewClient function - start a new thread" << std::endl;
 
-
     int tid;
     struct arg_struct* dim = (struct arg_struct*) threadArg;
-    //tid = *(int*)threadid;
+
     tid = dim->fd;
 
     Socket *mysocket = dim->server;
-//    string format;
-//    cin >> format;
+
     char buffer[1024];
     mysocket->reciveData(buffer, sizeof(buffer), tid);
     cout << buffer << endl;
 
-    string format(buffer);
     TaxiCenter* center = dim->center;
-    helperAddDriver(format, center, tid);
-
-
 
     Driver * driverFromClient;
     boost::iostreams::basic_array_source<char> deviceServerDriver(buffer, sizeof(buffer));
@@ -260,30 +234,19 @@ void *startNewClient(void *threadArg) {
 
     mysocket->sendData(serial_server_cab_str, tid);
 
-
-    //mysocket->sendData("sending a Trip....", tid);
-
     while(flag) {
 
     }
 
-
     cout << "pthread_exit, " << tid  << endl;
     pthread_exit(NULL);
 }
-
-
-
-
-
 
 void *startNewTripThread(void *threadArg) {
     std::cout << "Hello, from server function - start a new trip thread" << std::endl;
 
     int tid;
     struct arg_struct_trip* args = (struct arg_struct_trip*) threadArg;
-
-
 
     TaxiCenter* center = args->center;
     string format = args->format;
@@ -299,25 +262,18 @@ void *startNewTripThread(void *threadArg) {
     pthread_exit(NULL);
 }
 
-
-
-
-
 int main(int argc, char *argv[]){
     std::cout << "Hello, from server" << std::endl;
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
-    //Socket* socket = new Tcp(1, 88900, "127.0.0.1");
+    //Socket* socket = new Tcp(1, 90006, "127.0.0.1");
     Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
     socket->initialize();
-
-
 
     pthread_t *threads;
     pthread_t *threadTrip;
     int *threadsIdSockets;
-
 
     string input = "";
     string format;
@@ -361,6 +317,7 @@ int main(int argc, char *argv[]){
 
     int numberOfDrivers;
     cin >> input;
+
     while(input != "7"){
 
         if(input == "1") {
@@ -394,76 +351,11 @@ int main(int argc, char *argv[]){
                     cout << "Error:unable to create thread," << rc << endl;
                     exit(-1);
                 }
-
-//                //cin >> format;
-//                char buffer[1024];
-//                socket->reciveData(buffer, sizeof(buffer));
-//                cout << buffer << endl;
-//                string format(buffer);
-//                helperAddDriver(format, center);
-//                numberOfDrivers--;
             }
 
-//
-//            socket->acceptclient();
-//            char buffer[2048];
-//            socket->reciveData(buffer, sizeof(buffer));
-//            cout << buffer << endl;
-
-//            Driver * driverFromClient;
-//            boost::iostreams::basic_array_source<char> deviceServerDriver(buffer, sizeof(buffer));
-//            boost::iostreams::stream<boost::iostreams::basic_array_source<char> > sServerDriver(deviceServerDriver);
-//            boost::archive::binary_iarchive iaServerDriver(sServerDriver);
-//            iaServerDriver >> driverFromClient;
-
-            //cin >>format;
-            //helperAddDriver(format, center);
-//
-//            format = buffer;
-//            helperAddDriver(format, center);
-
-            //center->getDrivers()->insert(std::pair<int,Driver*>(driverFromClient->getId(), driverFromClient));
-
-
-            /*
-            while (numberOfDrivers > 0) {
-                //cin >> format;
-                char buffer[1024];
-                socket->reciveData(buffer, sizeof(buffer));
-                cout << buffer << endl;
-                string format(buffer);
-                helperAddDriver(format, center);
-                numberOfDrivers--;
-            }
-*/
-            /*
-             * send the taxi to the client
-             */
-/*
-            std::string serial_server_cab_str;
-
-            //look for the taxi with the id
-            int cabID = driverFromClient->getVahicleId();
-            TaxiCab * cab;
-            std::map<int,TaxiCab*>::iterator it = center->getCabs()->find(cabID);
-            if (it != center->getCabs()->end()) {
-                cab = it->second;
-            }
-            boost::iostreams::back_insert_device<std::string> inserterServerCab(serial_server_cab_str);
-            boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > sServerCab(inserterServerCab);
-            boost::archive::binary_oarchive oaServerCab(sServerCab);
-            oaServerCab << cab;
-            sServerCab.flush();
-
-            socket->sendData(serial_server_cab_str);
-*/
-
-//            socket->sendData("send the taxi to the client");
             input = "0";
-
         }
-        if(input == "2")
-        {
+        if(input == "2") {
             threadTrip = new pthread_t[1];
             cin >> format;
             struct arg_struct_trip * args = (struct arg_struct_trip*)malloc(sizeof(struct arg_struct_trip));
@@ -478,41 +370,31 @@ int main(int argc, char *argv[]){
                 exit(-1);
             }
         }
-        if(input == "3")
-        {
+        if(input == "3") {
             cin >> format;
             helperAddTaxi(format, center);
 
         }
-        if(input == "4")
-        {
+        if(input == "4") {
             int id =0;
             cin >> id;
             center->getDriverLocation(id);
         }
-
-        if(input == "7")
-        {
+        if(input == "7") {
             break;
         }
 
-        if(input == "9" )
-        {
-
-
+        if(input == "9" ) {
             clock += 1;
             // see if there are trips to be assigned
             center->startDriving(clock);
             // see if there are drivers to be moves
             center->moveTheCab(clock);
+            // send to the client any movements of the drivers
             sendPositionToClient(center, clock, socket);
-//            //send to the client any movements of the drivers
-//            sendPositionToClient(center, clock, socket);
             // see if there are trips to be deleted
             center->deleteTrip();
-
         }
-
         cin >> input;
     }
 

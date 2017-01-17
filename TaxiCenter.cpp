@@ -234,66 +234,9 @@ void TaxiCenter::deleteTrip() {
                     itDriver->second->addTrip(NULL);
                 }
             }
-            /*
-            if(currentTime == (startTime + tripDurance) ||
-                    ((gp1->getX() == gp2->getX()) && (gp1->getY() == gp2->getY()))){
-                //find the trip
-                std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
-                if (itDelete != this->trips->end()) {
-                    delete(itDelete->second);
-                    trips->erase(itDelete->first);
-                    itDriver->second->addTrip(NULL);
-                }
-            }
-             */
-            /*
-            if(gp1->getX() == gp2->getX()){
-                if(gp1->getY() == gp2->getY()) {
-                    //find the trip
-                    std::map<int,Trip*>::iterator itDelete = trips->find(itDriver->second->getTrip()->getTripId());
-                    if (itDelete != this->trips->end()) {
-                        delete(itDelete->second);
-                        trips->erase(itDelete->first);
-                        itDriver->second->addTrip(NULL);
-                    }
-                }
-            }
-             */
         }
 
         //get the next driver
         itDriver++;
     }
 }
-
-//TODO: the next few lines are deleting the trip from the array
-/*
- *
-        std::map<int,Trip*>::iterator itDelete = trips->find(itTrip->first);
-        if (itDelete != this->trips->end()) {
-            delete(itTrip->second);
-            trips->erase(itTrip->first);
-        }
- *
- *
- */
-
-/*
-void TaxiCenter::insertDriver(int id, int age,char status,  int experience, int vahicleId) {
-    Driver * d = new Driver(id,age,status,experience,vahicleId);
-    this->drivers.insert({id,*d});
-    this->location.insert({id, *startLoctaion});
-}
-*/
-/*
-void TaxiCenter::insertTaxi(int id, int type, char manufacturer, char color){
-    TaxiCab * cab = new TaxiCab(id,type,manufacturer,color);
-    this->cabs.insert({id, *cab});
-}
-*/
-/*
-void TaxiCenter::insertTrip(int id, int xStart, int yStart, int xEnd,int yEnd ,int passenger, double tarriff){
-    Trip * trip = new Trip(id,xStart,yStart,xEnd,yEnd,passenger,tarriff);
-    this->trips.insert({id,*trip});
-}
-*/

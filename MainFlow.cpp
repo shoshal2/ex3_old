@@ -210,14 +210,13 @@ int helperMain(TaxiCenter * center, Grid* grid, Socket* socket){
 int flag = 1;
 
 void *startNewClient(void *threadArg) {
-    std::cout << "Hello, from server function - start a new thread" << std::endl;
+    std::cout << "Hello, from server startNewClient function - start a new thread" << std::endl;
 
 
     int tid;
     struct arg_struct* dim = (struct arg_struct*) threadArg;
     //tid = *(int*)threadid;
     tid = dim->fd;
-    cout << "Hello World! Socket ID, " << tid << endl;
 
     Socket *mysocket = dim->server;
 //    string format;
@@ -230,17 +229,52 @@ void *startNewClient(void *threadArg) {
     TaxiCenter* center = dim->center;
     helperAddDriver(format, center, tid);
 
-    mysocket->sendData("sending a Trip....", tid);
-    //mysocket->sendData("7", tid);
+
+
+    Driver * driverFromClient;
+    boost::iostreams::basic_array_source<char> deviceServerDriver(buffer, sizeof(buffer));
+    boost::iostreams::stream<boost::iostreams::basic_array_source<char> > sServerDriver(deviceServerDriver);
+    boost::archive::binary_iarchive iaServerDriver(sServerDriver);
+    iaServerDriver >> driverFromClient;
+
+    center->getDrivers()->insert(std::pair<int,Driver*>(driverFromClient->getId(), driverFromClient));
+
+    /*
+     * send the taxi to the client
+     */
+
+    std::string serial_server_cab_str;
+
+    //look for the taxi with the id
+    int cabID = driverFromClient->getVahicleId();
+    TaxiCab * cab;
+    std::map<int,TaxiCab*>::iterator it = center->getCabs()->find(cabID);
+    if (it != center->getCabs()->end()) {
+        cab = it->second;
+    }
+    boost::iostreams::back_insert_device<std::string> inserterServerCab(serial_server_cab_str);
+    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > sServerCab(inserterServerCab);
+    boost::archive::binary_oarchive oaServerCab(sServerCab);
+    oaServerCab << cab;
+    sServerCab.flush();
+
+    mysocket->sendData(serial_server_cab_str, tid);
+
+
+    //mysocket->sendData("sending a Trip....", tid);
+
     while(flag) {
 
     }
 
 
     cout << "pthread_exit, " << tid  << endl;
-
     pthread_exit(NULL);
 }
+
+
+
+
 
 
 void *startNewTripThread(void *threadArg) {

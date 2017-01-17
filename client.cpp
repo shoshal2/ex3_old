@@ -1,6 +1,4 @@
-//
-// Created by leerosset on 29/12/16.
-//
+
 
 #include "client.h"
 #include "Driver.h"

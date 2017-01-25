@@ -22,11 +22,21 @@
 #include <boost/serialization/export.hpp>
 #include "Tcp.h"
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+
+
+bool is_digits(const std::string &str)
+{
+    return str.find_first_not_of("0123456789") == std::string::npos;
+}
 
 
 
 // take the input string and add a new driver to taxiCanter
-Driver* helperAddDriver(string str){
+Driver* helperAddDriver(string str, int* flag){
 
     int id;
     int age;
@@ -34,22 +44,88 @@ Driver* helperAddDriver(string str){
     int experience;
     int vahicleId;
 
-
+    int counter = 0;
     for (unsigned int i=0; i < str.size(); i++)
     {
         if (str[i] == ',') {
+            counter++;
             str[i] = ' ';
         }
+    }
+
+    if(counter != 4){
+        *flag = 0;
+        return NULL;
     }
 
     str.size();
     stringstream ss(str);
 
+
+    stringstream check(str);
+    string input;
+
+
+    check >> input;
+    if(!is_digits(input)){
+        *flag = 0;
+        return NULL;
+    }
     ss >> id;
+    if(id < 0){
+        *flag = 0;
+        return NULL;
+    }
+
+
+
+    check >> input;
+    if(!is_digits(input)){
+        *flag = 0;
+        return NULL;
+    }
     ss >> age;
+    if(age < 0){
+        *flag = 0;
+        return NULL;
+    }
+
+
+
+    check >> input;
+    if(is_digits(input)){
+        *flag = 0;
+        return NULL;
+    }
     ss >> status;
+    if(status != 'S' && status != 'M' && status != 'D' && status != 'W'){
+        *flag = 0;
+        return NULL;
+    }
+
+
+    check >> input;
+    if(!is_digits(input)){
+        *flag = 0;
+        return NULL;
+    }
     ss >> experience;
+    if(experience < 0){
+        *flag = 0;
+        return NULL;
+    }
+
+
+    check >> input;
+    if(!is_digits(input)){
+        *flag = 0;
+        return NULL;
+    }
     ss >> vahicleId;
+    if(vahicleId < 0){
+        *flag = 0;
+        return NULL;
+    }
 
     return new Driver(id, age, status, experience, vahicleId);
 }
@@ -60,15 +136,22 @@ int main(int argc, char *argv[]) {
 
     string input = "";
 
-    Tcp tcp(0, atoi(argv[2]), argv[1]);
-    tcp.initialize();
 
     Driver *driver;
     GridPoint *point;
     TaxiCab* cab;
 
+    int flag = 1;
     cin >> input;
-    driver = helperAddDriver(input);
+    //driver = helperAddDriver(input, &flag);
+    helperAddDriver(input, &flag);
+    if(flag == 0) {
+        return 0;
+    }
+
+
+    Tcp tcp(0, atoi(argv[2]), argv[1]);
+    tcp.initialize();
 
 
     std::string serial_client_driver_str;
@@ -80,11 +163,10 @@ int main(int argc, char *argv[]) {
 
     tcp.sendData(serial_client_driver_str, 0);
 
-    //tcp.sendData(input,0);
 
     char buffer2[2048];
     tcp.reciveData(buffer2, sizeof(buffer2),0);
-    //cout << buffer2 << endl;
+
 
     std::string serial_cab_str;
     boost::iostreams::basic_array_source<char> deviceClientCab(buffer2, sizeof(buffer2));
@@ -102,7 +184,7 @@ int main(int argc, char *argv[]) {
     while(true) {
         char buffer3[2048];
         tcp.reciveData(buffer3, sizeof(buffer3),0);
-        //string point_str(buffer3);
+
 
         if(buffer3[0] == '7')
             break;
@@ -112,7 +194,6 @@ int main(int argc, char *argv[]) {
         boost::archive::binary_iarchive iaClientPoint(sClientPoint);
         iaClientPoint >> point;
 
-        //cout << buffer3 << endl;
 
     }
 

@@ -131,7 +131,7 @@ Driver* helperAddDriver(string str, int* flag){
 }
 
 
-int mainc(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
     string input = "";
@@ -143,8 +143,7 @@ int mainc(int argc, char *argv[]) {
 
     int flag = 1;
     cin >> input;
-    //driver = helperAddDriver(input, &flag);
-    helperAddDriver(input, &flag);
+    driver = helperAddDriver(input, &flag);
     if(flag == 0) {
         return 0;
     }

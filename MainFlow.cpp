@@ -50,6 +50,10 @@ struct arg_struct_trip {
     string* format;
 };
 
+bool isDigit(const std::string &str) {
+    return str.find_first_not_of("0123456789") == std::string::npos;
+}
+
 // take the input string and add a new driver to taxiCanter
 void helperAddDriver(string str, TaxiCenter* center);
 
@@ -267,25 +271,25 @@ int checkTripValidity(string str, int xSize, int ySize){
     int passenger;
     int time;
     double tarriff;
-
+    int counter = 0;
 
     for (unsigned int i=0; i < str.size(); i++)
     {
         if (str[i] == ',') {
+            counter++;
             str[i] = ' ';
         }
     }
 
-    stringstream ss(str);
-
-    //find the size of the input
-    ss.seekg(0, ios::end);
-    int size = ss.tellg();
-    ss.seekg(0, ios::beg);
-
-    if (size < 0 || size > 8) {
+    //there were more than 2 numbers
+    if (counter > 7) {
         return -1;
     }
+
+    stringstream ss(str);
+    stringstream check(str);
+    string inputTemp = "";
+
 
     ss >> id;
     ss >> xStart;
@@ -297,31 +301,56 @@ int checkTripValidity(string str, int xSize, int ySize){
     ss >> time;
 
     // if the id is invalid
+
+    check >> inputTemp;
+    if(!isDigit(inputTemp)) {
+        return -1;
+    }
     if(id < 0) {
         return -1;
     }
 
     // if the xstart of the trip or the xend of the trip are invalid
+    check >> inputTemp;
+    if(!isDigit(inputTemp)) {
+        return -1;
+    }
     if(xStart < 0 || xEnd > xSize - 1) {
         return -1;
     }
 
     // if the ystart of the trip or the yend of the trip are invalid
+    check >> inputTemp;
+    if(!isDigit(inputTemp)) {
+        return -1;
+    }
     if(yStart < 0 || yEnd > ySize - 1) {
         return -1;
     }
 
     // if the number of passengers is invalid
+    check >> inputTemp;
+    if(!isDigit(inputTemp)) {
+        return -1;
+    }
     if(passenger < 0) {
         return  -1;
     }
 
     //if the tariff is invalid
+    check >> inputTemp;
+    if(!isDigit(inputTemp)) {
+        return -1;
+    }
     if(tarriff < 0) {
         return -1;
     }
 
     // if the trip's starting time is invalid
+    check >> inputTemp;
+    if(!isDigit(inputTemp)) {
+        return -1;
+    }
     if(time <= 0) {
         return -1;
     }
@@ -335,63 +364,69 @@ int checkTaxiValidity(string str) {
     int type;
     char manufacturer;
     char color;
+    int counter = 0;
 
     for (unsigned int i=0; i < str.size(); i++)
     {
         if (str[i] == ',') {
+            counter++;
             str[i] = ' ';
         }
     }
 
-    stringstream ss(str);
 
-    //find the size of the input
-    ss.seekg(0, ios::end);
-    int size = ss.tellg();
-    ss.seekg(0, ios::beg);
-
-    if (size < 0 || size > 4) {
+    //there were more than 4 inputs
+    if (counter > 3) {
         return -1;
     }
+
+    stringstream ss(str);
+    stringstream check(str);
+    string inputTemp = "";
 
     ss >> id;
     ss >> type;
     ss >> manufacturer;
     ss >> color;
 
+    check >> inputTemp;
+    if(!isDigit(inputTemp)) {
+        return -1;
+    }
     if(id < 0) {
         return -1;
     }
 
-    if(type != 1 || type != 2){
+    check >> inputTemp;
+    if(!isDigit(inputTemp)) {
+        return -1;
+    }
+    if(type != 1 && type != 2){
         return -1;
     }
 
-    if(manufacturer != 'H' || manufacturer != 'S' || manufacturer != 'T'
-            || manufacturer != 'F') {
+    if(manufacturer != 'H' && manufacturer != 'S' && manufacturer != 'T'
+            && manufacturer != 'F') {
         return -1;
     }
 
-    if(color != 'R' || color != 'B' || color != 'G'
-       || color != 'P' || color != 'W') {
+    if(color != 'R' && color != 'B' && color != 'G'
+       && color != 'P' && color != 'W') {
         return -1;
     }
 
     return 1;
 }
 
-bool is_digits(const std::string &str) {
-    return str.find_first_not_of("0123456789") == std::string::npos;
-}
 
 
-int main(int argc, char *argv[]){
+int mainc(int argc, char *argv[]){
     std::cout << "Hello, from server" << std::endl;
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
-    Socket* socket = new Tcp(1, 90006, "127.0.0.1");
-    //Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
+    //Socket* socket = new Tcp(1, 90006, "127.0.0.1");
+    Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
     socket->initialize();
 
     pthread_t *threads;
@@ -419,28 +454,36 @@ int main(int argc, char *argv[]){
 
         // get the size of the grid
         char gridSize[4048];
+
         cin.getline(gridSize, sizeof(gridSize));
 
         stringstream ss(gridSize);
         stringstream check(gridSize);
         string inputTemp = "";
+        string inputEnd = "";
+        int counter = 0;
 
-        check >> inputTemp;
-        if(!is_digits(inputTemp)) {
+        for (int i = 0; gridSize[i] != NULL; i++)
+            if(gridSize[i] == ' ') {
+                counter++;
+            }
+
+        //there were more than 2 numbers
+        if (counter > 1) {
             cout << "-1" << endl;
             inputsValid = false;
             continue;
         }
 
         check >> inputTemp;
-        if(!is_digits(inputTemp)) {
+        if(!isDigit(inputTemp)) {
             cout << "-1" << endl;
             inputsValid = false;
             continue;
         }
 
         check >> inputTemp;
-        if(inputTemp != "") {
+        if(!isDigit(inputTemp)) {
             cout << "-1" << endl;
             inputsValid = false;
             continue;
@@ -449,7 +492,6 @@ int main(int argc, char *argv[]){
         ss >> xSize;
         ss >> ySize;
 
-        if (xSize )
         // check the validity of the grids size
         if (xSize <= 0 || ySize <= 0) {
             cout << "-1" << endl;
@@ -457,8 +499,40 @@ int main(int argc, char *argv[]){
             continue;
         }
 
+        /*
+         * check if the number of obstacle is valid
+         */
+
         // get the size of the obstacles
-        cin >> numOfObstacles;
+        char obstaclesNumber[100];
+        cin.getline(obstaclesNumber, sizeof(obstaclesNumber));
+
+        stringstream ss1(obstaclesNumber);
+        stringstream check1(obstaclesNumber);
+        inputTemp = "";
+        counter = 0;
+
+        for (int i = 0; obstaclesNumber[i] != NULL; i++)
+            if(obstaclesNumber[i] == ' ') {
+                counter++;
+            }
+
+        //there were more than 1 number
+        if (counter > 0) {
+            cout << "-1" << endl;
+            inputsValid = false;
+            continue;
+        }
+
+        check1 >> inputTemp;
+        if(!isDigit(inputTemp)) {
+            cout << "-1" << endl;
+            inputsValid = false;
+            continue;
+        }
+
+        ss1 >> numOfObstacles;
+
 
         //check the validity of the obstacle's number
         if (numOfObstacles < 0){
@@ -469,34 +543,36 @@ int main(int argc, char *argv[]){
 
         if (numOfObstacles > 0) {
             int i;
+            counter = 0;
             for (i = 0; i < numOfObstacles; i++) {
                 //get the obstacle's point
                 cin >> input;
                 for (unsigned int i = 0; i < input.size(); i++) {
                     if (input[i] == ',') {
+                        counter++;
                         input[i] = ' ';
                     }
                 }
+
+                if(counter > 1) {
+                    cout << "-1" << endl;
+                    inputsValid = false;
+                    continue;
+                }
+
                 stringstream ss(input);
                 stringstream check(input);
                 string inputTemp = "";
 
                 check >> inputTemp;
-                if(!is_digits(inputTemp)) {
+                if(!isDigit(inputTemp)) {
                     cout << "-1" << endl;
                     inputsValid = false;
                     continue;
                 }
 
                 check >> inputTemp;
-                if(!is_digits(inputTemp)) {
-                    cout << "-1" << endl;
-                    inputsValid = false;
-                    continue;
-                }
-
-                check >> inputTemp;
-                if(inputTemp != "") {
+                if(!isDigit(inputTemp)) {
                     cout << "-1" << endl;
                     inputsValid = false;
                     continue;
@@ -523,26 +599,52 @@ int main(int argc, char *argv[]){
 
             if (input == "1") {
 
-                cin >> input;
-                stringstream ss(input);
-                ss >> numberOfDrivers;
+                /*
+ * check if the number of obstacle is valid
+ */
 
-                //find the size of the input
-                ss.seekg(0, ios::end);
-                int size = ss.tellg();
-                ss.seekg(0, ios::beg);
+                // get the size of the obstacles
+                char driversNumber[100];
+                cin.ignore();
+                cin.getline(driversNumber, sizeof(driversNumber));
 
-                if(size = 0 || size > 1) {
+                stringstream ss1(driversNumber);
+                stringstream check1(driversNumber);
+                inputTemp = "";
+                counter = 0;
+
+                for (int i = 0; driversNumber[i] != NULL; i++)
+                    if(driversNumber[i] == ' ') {
+                        counter++;
+                    }
+
+                //there were more than 1 number
+                if (counter > 0) {
                     cout << "-1" << endl;
                     inputsValid = false;
-                    continue;
+                    input = "7";
+                    cin.ignore();
+                    break;
                 }
+
+                check1 >> inputTemp;
+                if(!isDigit(inputTemp)) {
+                    cout << "-1" << endl;
+                    inputsValid = false;
+                    input = "7";
+                    cin.ignore();
+                    break;
+                }
+
+                ss1 >> numberOfDrivers;
 
                 //check the validity of the drivers number
                 if(numberOfDrivers <= 0) {
                     cout << "-1" << endl;
                     inputsValid = false;
-                    continue;
+                    input = "7";
+                    cin.ignore();
+                    break;
                 }
 
                 threads = new pthread_t[numberOfDrivers];
@@ -586,7 +688,10 @@ int main(int argc, char *argv[]){
                 if(temp < 0) {
                     cout << "-1" << endl;
                     inputsValid = false;
-                    continue;
+                    input = "7";
+                    cin.ignore();
+                    break;
+
                 }
 
                 args->xSize = xSize;
@@ -606,7 +711,9 @@ int main(int argc, char *argv[]){
                 if(temp < 0) {
                     cout << "-1" << endl;
                     inputsValid = false;
-                    continue;
+                    input = "7";
+                    cin.ignore();
+                    break;
                 }
                 helperAddTaxi(format, center);
 

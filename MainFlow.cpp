@@ -47,7 +47,7 @@ struct arg_struct_trip {
     int ySize;
     Obstacle * obstacle;
     TaxiCenter* center;
-    string format;
+    string* format;
 };
 
 // take the input string and add a new driver to taxiCanter
@@ -190,7 +190,6 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
 int flag = 1;
 
 void *startNewClient(void *threadArg) {
-    std::cout << "Hello, from server startNewClient function - start a new thread" << std::endl;
 
     int tid;
     struct arg_struct* dim = (struct arg_struct*) threadArg;
@@ -201,7 +200,6 @@ void *startNewClient(void *threadArg) {
 
     char buffer[1024];
     mysocket->reciveData(buffer, sizeof(buffer), tid);
-    cout << buffer << endl;
 
     TaxiCenter* center = dim->center;
 
@@ -238,27 +236,24 @@ void *startNewClient(void *threadArg) {
 
     }
 
-    cout << "pthread_exit, " << tid  << endl;
     pthread_exit(NULL);
 }
 
 void *startNewTripThread(void *threadArg) {
-    std::cout << "Hello, from server function - start a new trip thread" << std::endl;
 
     int tid;
     struct arg_struct_trip* args = (struct arg_struct_trip*) threadArg;
 
     TaxiCenter* center = args->center;
-    string format = args->format;
+    string* format = args->format;
     int xSize = args->xSize;
     int ySize = args->ySize;
     Obstacle* obstacle = args->obstacle;
 
     Grid * g = new Grid(xSize, ySize, obstacle);
 
-    helperAddTrip(format, center, g);
+    helperAddTrip(*format, center, g);
 
-    cout << "pthread_exit , startNewTripThread" << endl;
     pthread_exit(NULL);
 }
 
@@ -285,8 +280,8 @@ int main(int argc, char *argv[]){
     Obstacle * obstacle = new Obstacle();
 
     // get the size of the grid
-    char gridSize[100];
-    cin.getline(gridSize,sizeof(input));
+    char gridSize[4048];
+    cin.getline(gridSize,sizeof(gridSize));
 
     stringstream ss(gridSize);
     ss >> xSize;
@@ -343,7 +338,6 @@ int main(int argc, char *argv[]){
                 args->fd = k;
                 threadsIdSockets[count-1]= k;
                 count--;
-                cout << "K: " << k << endl;
                 rc = pthread_create(&threads[i], NULL, startNewClient, (void *)args);
                 i++;
 
@@ -360,7 +354,7 @@ int main(int argc, char *argv[]){
             cin >> format;
             struct arg_struct_trip * args = (struct arg_struct_trip*)malloc(sizeof(struct arg_struct_trip));
             args->center = center;
-            args->format = format;
+            args->format = new string(format);
             args->xSize = xSize;
             args->ySize = ySize;
             args->obstacle = obstacle;

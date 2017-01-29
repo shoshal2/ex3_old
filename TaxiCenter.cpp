@@ -127,6 +127,24 @@ void TaxiCenter::getDriverLocation(int id) {
      */
 }
 
+
+/**
+ * this function return 1 if the driver with the input id Exist, 0 otherwise
+ * @param id
+ * @return
+ */
+int TaxiCenter::isDriverExist(int id) {
+    std::map<int,Driver*>::iterator it = this->drivers->find(id);
+    it->second->getPosition()->print();
+    /*
+    std::map<int,GridPoint>::iterator it = this->location.find(id);
+    if (it != this->location.end()) {
+        it->second.print();
+    }
+     */
+}
+
+
 /**
  * the method that starts the actual driving: the method assigns the driver
  * to its trip and taxi.

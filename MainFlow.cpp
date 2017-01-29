@@ -7,6 +7,8 @@
 
 
 #include "TaxiCenter.h"
+#include "Job.h"
+#include "ThreadPool.h"
 #include "Obstacle.h"
 #include <iostream>
 #include <string>
@@ -191,6 +193,8 @@ void sendPositionToClient(TaxiCenter* center, int time, Socket* soc) {
     }
 }
 
+
+
 int flag = 1;
 
 void *startNewClient(void *threadArg) {
@@ -257,8 +261,8 @@ void *startNewTripThread(void *threadArg) {
     Grid * g = new Grid(xSize, ySize, obstacle);
 
     helperAddTrip(*format, center, g);
-
-    pthread_exit(NULL);
+    return NULL;
+    //pthread_exit(NULL);
 }
 
 int checkTripValidity(string str, int xSize, int ySize){
@@ -282,7 +286,7 @@ int checkTripValidity(string str, int xSize, int ySize){
     }
 
     //there were more than 2 numbers
-    if (counter > 7) {
+    if (counter != 7) {
         return -1;
     }
 
@@ -375,8 +379,8 @@ int checkTaxiValidity(string str) {
     }
 
 
-    //there were more than 4 inputs
-    if (counter > 3) {
+    //there were more than 4 inputs or less than 4 inputs
+    if (counter != 3) {
         return -1;
     }
 
@@ -420,7 +424,7 @@ int checkTaxiValidity(string str) {
 
 
 
-int mainc(int argc, char *argv[]){
+int main(int argc, char *argv[]){
     std::cout << "Hello, from server" << std::endl;
     TaxiCenter* center = new TaxiCenter();
 
@@ -428,6 +432,10 @@ int mainc(int argc, char *argv[]){
     //Socket* socket = new Tcp(1, 90006, "127.0.0.1");
     Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
     socket->initialize();
+
+    ThreadPool pool(5);
+    vector<Job *> *v = new vector<Job*>();
+
 
     pthread_t *threads;
     pthread_t *threadTrip;
@@ -463,10 +471,11 @@ int mainc(int argc, char *argv[]){
         string inputEnd = "";
         int counter = 0;
 
-        for (int i = 0; gridSize[i] != NULL; i++)
-            if(gridSize[i] == ' ') {
+        for (int i = 0; gridSize[i] != '\0'; i++) {
+            if (gridSize[i] == ' ') {
                 counter++;
             }
+        }
 
         //there were more than 2 numbers
         if (counter > 1) {
@@ -512,7 +521,7 @@ int mainc(int argc, char *argv[]){
         inputTemp = "";
         counter = 0;
 
-        for (int i = 0; obstaclesNumber[i] != NULL; i++)
+        for (int i = 0; obstaclesNumber[i] != '\0'; i++)
             if(obstaclesNumber[i] == ' ') {
                 counter++;
             }
@@ -595,15 +604,14 @@ int mainc(int argc, char *argv[]){
         }
         cin >> input;
 
+
         while (input != "7") {
 
             if (input == "1") {
 
-                /*
- * check if the number of obstacle is valid
- */
 
-                // get the size of the obstacles
+
+                // get the number of drivers
                 char driversNumber[100];
                 cin.ignore();
                 cin.getline(driversNumber, sizeof(driversNumber));
@@ -613,7 +621,7 @@ int mainc(int argc, char *argv[]){
                 inputTemp = "";
                 counter = 0;
 
-                for (int i = 0; driversNumber[i] != NULL; i++)
+                for (int i = 0; driversNumber[i] != '\0'; i++)
                     if(driversNumber[i] == ' ') {
                         counter++;
                     }
@@ -697,11 +705,14 @@ int mainc(int argc, char *argv[]){
                 args->xSize = xSize;
                 args->ySize = ySize;
                 args->obstacle = obstacle;
-                int rc = pthread_create(&threadTrip[0], NULL, startNewTripThread, (void *) args);
-                if (rc) {
-                    cout << "Error:unable to create thread," << rc << endl;
-                    exit(-1);
-                }
+
+                v->push_back(new Job(startNewTripThread, (void *) args));
+                pool.addJob(v->back());
+//                int rc = pthread_create(&threadTrip[0], NULL, startNewTripThread, (void *) args);
+//                if (rc) {
+//                    cout << "Error:unable to create thread," << rc << endl;
+//                    exit(-1);
+//                }
             }
             if (input == "3") {
                 cin >> format;
@@ -721,6 +732,13 @@ int mainc(int argc, char *argv[]){
             if (input == "4") {
                 int id = 0;
                 cin >> id;
+                if(!center->isDriverExist(id)){
+                    cout << "-1" << endl;
+                    inputsValid = false;
+                    input = "7";
+                    cin.ignore();
+                    break;
+                }
                 center->getDriverLocation(id);
             }
             if (input == "7") {
@@ -740,7 +758,17 @@ int mainc(int argc, char *argv[]){
             }
             cin >> input;
         }
+
     }
+
+    int vectorSize = v->size();
+    for(int i=0; i < vectorSize; i++) {
+        delete(v->back());
+        v->pop_back();
+    }
+    pool.terminate();
+
+
     flag = 0;
     int k = 0;
     while(k < numberOfDrivers){

@@ -1,72 +1,57 @@
 //
-// Created by mahmuds on 1/25/17.
+// Created by mahmuds on 1/28/17.
 //
 
-
 #include "ThreadPool.h"
-
-
-// the constructor just launches some amount of workers
-inline ThreadPool::ThreadPool(size_t threads)
-        :   stop(false)
-{
-    for(size_t i = 0;i<threads;++i)
-        workers.emplace_back(
-                [this]
-                {
-                    for(;;)
-                    {
-                        std::function<void()> task;
-
-                        {
-                            std::unique_lock<std::mutex> lock(this->queue_mutex);
-                            this->condition.wait(lock,
-                                                 [this]{ return this->stop || !this->tasks.empty(); });
-                            if(this->stop && this->tasks.empty())
-                                return;
-                            task = std::move(this->tasks.front());
-                            this->tasks.pop();
-                        }
-
-                        task();
-                    }
-                }
-        );
+#include <unistd.h>
+#include <iostream>
+static void *startJobs(void *arg) {
+    ThreadPool *pool = (ThreadPool *)arg;
+    pool->doJobs();
+    return NULL;
 }
 
-// add new work item to the pool
-template<class F, class... Args>
-auto ThreadPool::enqueue(F&& f, Args&&... args)
--> std::future<typename std::result_of<F(Args...)>::type>
-{
-    using return_type = typename std::result_of<F(Args...)>::type;
-
-    auto task = std::make_shared< std::packaged_task<return_type()> >(
-            std::bind(std::forward<F>(f), std::forward<Args>(args)...)
-    );
-
-    std::future<return_type> res = task->get_future();
-    {
-        std::unique_lock<std::mutex> lock(queue_mutex);
-
-        // don't allow enqueueing after stopping the pool
-        if(stop)
-            throw std::runtime_error("enqueue on stopped ThreadPool");
-
-        tasks.emplace([task](){ (*task)(); });
+void ThreadPool::doJobs() {
+    while (!stop) {
+        pthread_mutex_lock(&lock);
+        if (!jobs_queue.empty()) {
+            Job* job = jobs_queue.front();
+            jobs_queue.pop();
+            pthread_mutex_unlock(&lock);
+            job->execute();
+        }
+        else {
+            pthread_mutex_unlock(&lock);
+            sleep(1);
+        }
     }
-    condition.notify_one();
-    return res;
+    pthread_exit(NULL);
 }
 
-// the destructor joins all threads
-inline ThreadPool::~ThreadPool()
-{
-    {
-        std::unique_lock<std::mutex> lock(queue_mutex);
-        stop = true;
+void ThreadPool::addJob(Job *job) {
+    jobs_queue.push(job);
+}
+
+ThreadPool::ThreadPool(int threads_num) : threads_num(threads_num), stop(false) {
+    // TODO Auto-generated constructor stub
+    threads = new pthread_t[threads_num];
+
+    pthread_mutex_init(&lock, NULL);
+    for (int i = 0; i < threads_num; i++) {
+        pthread_create(threads + i, NULL, startJobs, this);
     }
-    condition.notify_all();
-    for(std::thread &worker: workers)
-        worker.join();
+}
+
+void ThreadPool::terminate() {
+    stop = true;
+}
+
+ThreadPool::~ThreadPool() {
+    // TODO Auto-generated destructor stub
+    delete[] threads;
+    pthread_mutex_destroy(&lock);
+}
+
+bool ThreadPool::isEmpty() {
+
 }

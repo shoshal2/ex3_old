@@ -44,6 +44,7 @@ public:
     void startDriving(int time);
     void moveTheCab(int time);
     void deleteTrip();
+    int isDriverExist(int id);
     void exit();
 
 

@@ -262,7 +262,7 @@ void *startNewTripThread(void *threadArg) {
 
     helperAddTrip(*format, center, g);
     return NULL;
-    //pthread_exit(NULL);
+
 }
 
 int checkTripValidity(string str, int xSize, int ySize){
@@ -429,8 +429,8 @@ int main(int argc, char *argv[]){
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
-    Socket* socket = new Tcp(1, 90006, "127.0.0.1");
-    //Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
+    //Socket* socket = new Tcp(1, 90006, "127.0.0.1");
+    Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
     socket->initialize();
 
     ThreadPool pool(5);
@@ -681,8 +681,8 @@ int main(int argc, char *argv[]){
                         exit(-1);
                     }
                 }
-
-                input = "0";
+                cin >> input;
+                continue;
             }
             if (input == "2") {
                 threadTrip = new pthread_t[1];
@@ -739,7 +739,7 @@ int main(int argc, char *argv[]){
             if (input == "4") {
                 int id = 0;
                 cin >> id;
-                if(!center->isDriverExist(id)){
+                if(center->isDriverExist(id) == 0){
                     cout << "-1" << endl;
                     //inputsValid = false;
                     //input = "7";
@@ -764,6 +764,9 @@ int main(int argc, char *argv[]){
                 sendPositionToClient(center, clock, socket);
                 // see if there are trips to be deleted
                 center->deleteTrip();
+            }
+            if(input != "9" && input != "7" && input != "4" && input != "3" && input != "2" && input != "1"){
+                cout << "-1" << endl;
             }
             cin >> input;
         }

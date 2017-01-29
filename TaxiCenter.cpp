@@ -136,9 +136,10 @@ void TaxiCenter::getDriverLocation(int id) {
 int TaxiCenter::isDriverExist(int id) {
     std::map<int, Driver*>::iterator itDriver = drivers->begin();
     while(itDriver != drivers->end()) {
-        if (itDriver->second->getId() == id) {
+        if(itDriver->second->getId() == id){
             return 1;
         }
+        itDriver++;
     }
     return 0;
 }

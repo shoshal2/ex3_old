@@ -134,14 +134,13 @@ void TaxiCenter::getDriverLocation(int id) {
  * @return
  */
 int TaxiCenter::isDriverExist(int id) {
-    std::map<int,Driver*>::iterator it = this->drivers->find(id);
-    it->second->getPosition()->print();
-    /*
-    std::map<int,GridPoint>::iterator it = this->location.find(id);
-    if (it != this->location.end()) {
-        it->second.print();
+    std::map<int, Driver*>::iterator itDriver = drivers->begin();
+    while(itDriver != drivers->end()) {
+        if (itDriver->second->getId() == id) {
+            return 1;
+        }
     }
-     */
+    return 0;
 }
 
 

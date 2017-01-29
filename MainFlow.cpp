@@ -429,8 +429,8 @@ int main(int argc, char *argv[]){
     TaxiCenter* center = new TaxiCenter();
 
     int clock = 0; // The Time of the Server
-    //Socket* socket = new Tcp(1, 90006, "127.0.0.1");
-    Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
+    Socket* socket = new Tcp(1, 90006, "127.0.0.1");
+    //Socket* socket = new Tcp(1, atoi(argv[1]), "127.0.0.1");
     socket->initialize();
 
     ThreadPool pool(5);
@@ -609,8 +609,6 @@ int main(int argc, char *argv[]){
 
             if (input == "1") {
 
-
-
                 // get the number of drivers
                 char driversNumber[100];
                 cin.ignore();
@@ -629,19 +627,21 @@ int main(int argc, char *argv[]){
                 //there were more than 1 number
                 if (counter > 0) {
                     cout << "-1" << endl;
-                    inputsValid = false;
-                    input = "7";
-                    cin.ignore();
-                    break;
+                    //continue;
+                    //inputsValid = false;
+                    //input = "7";
+                    //cin.ignore();
+                    //break;
                 }
 
                 check1 >> inputTemp;
                 if(!isDigit(inputTemp)) {
                     cout << "-1" << endl;
-                    inputsValid = false;
-                    input = "7";
+                    continue;
+                    //inputsValid = false;
+                    //input = "7";
                     cin.ignore();
-                    break;
+                    //break;
                 }
 
                 ss1 >> numberOfDrivers;
@@ -649,10 +649,11 @@ int main(int argc, char *argv[]){
                 //check the validity of the drivers number
                 if(numberOfDrivers <= 0) {
                     cout << "-1" << endl;
-                    inputsValid = false;
-                    input = "7";
-                    cin.ignore();
-                    break;
+                    //continue;
+                    //inputsValid = false;
+                    //input = "7";
+                    //cin.ignore();
+                    //break;
                 }
 
                 threads = new pthread_t[numberOfDrivers];
@@ -695,19 +696,21 @@ int main(int argc, char *argv[]){
                 // if the temp is negative, then the trip input was invalid
                 if(temp < 0) {
                     cout << "-1" << endl;
-                    inputsValid = false;
-                    input = "7";
-                    cin.ignore();
-                    break;
+                    //inputsValid = false;
+                    //input = "7";
+                    //cin.ignore();
+                    //break;
 
                 }
+                else {
+                    args->xSize = xSize;
+                    args->ySize = ySize;
+                    args->obstacle = obstacle;
 
-                args->xSize = xSize;
-                args->ySize = ySize;
-                args->obstacle = obstacle;
+                    v->push_back(new Job(startNewTripThread, (void *) args));
+                    pool.addJob(v->back());
+                }
 
-                v->push_back(new Job(startNewTripThread, (void *) args));
-                pool.addJob(v->back());
 //                int rc = pthread_create(&threadTrip[0], NULL, startNewTripThread, (void *) args);
 //                if (rc) {
 //                    cout << "Error:unable to create thread," << rc << endl;
@@ -721,12 +724,16 @@ int main(int argc, char *argv[]){
                 // if the temp is negative, then the taxi input was invalid
                 if(temp < 0) {
                     cout << "-1" << endl;
-                    inputsValid = false;
-                    input = "7";
-                    cin.ignore();
-                    break;
+                    //continue;
+                    //inputsValid = false;
+                    //input = "7";
+                    //cin.ignore();
+                    //break;
                 }
-                helperAddTaxi(format, center);
+                else {
+                    helperAddTaxi(format, center);
+                }
+
 
             }
             if (input == "4") {
@@ -734,12 +741,14 @@ int main(int argc, char *argv[]){
                 cin >> id;
                 if(!center->isDriverExist(id)){
                     cout << "-1" << endl;
-                    inputsValid = false;
-                    input = "7";
-                    cin.ignore();
-                    break;
+                    //inputsValid = false;
+                    //input = "7";
+                    //cin.ignore();
+                    //break;
                 }
-                center->getDriverLocation(id);
+                else{
+                    center->getDriverLocation(id);
+                }
             }
             if (input == "7") {
                 break;

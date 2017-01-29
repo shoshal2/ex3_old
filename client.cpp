@@ -131,7 +131,7 @@ Driver* helperAddDriver(string str, int* flag){
 }
 
 
-int main(int argc, char *argv[]) {
+int mainc(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
     string input = "";
